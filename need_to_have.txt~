@@ -1,0 +1,24 @@
+ArcGIS 3.14 API
+
+X= confirmed
+0= to_check
+!= unavailable
+
+Possible?
+[ X ]Show satellite map
+[ X ]Poligonal selection
+[ 0 ]Access elevation data
+[ 0 ]Extract elevation data/work with the data
+
+----------------------------------------------------------------
+
+ArcGIS 4.0 API
+
+Possible?
+[ 0 ]Show satellite map
+[ 0 ]Poligonal selection
+[ 0 ]Access elevation data
+[ 0 ]Extract elevation data/work with the data
+
+ElevationProfile widget - user-specified input geometry---
+--this shows the elevation profile of the terrain(only)
