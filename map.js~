@@ -1,0 +1,8 @@
+(function(window,google,mapster){
+
+	var mapOptions = mapster.MAP_OPTIONS,
+
+	map = new google.maps.Map(document.getElementById('map'),mapOptions);
+	
+}(window, google, window.Mapster || (window.Mapster = {})));
+
