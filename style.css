@@ -22,16 +22,16 @@ html, body {
 	left:0;
 	right:0;
 	width: 100%;
-	height:60px;
+	height:4%;
 	text-align: center;
 }
 
 #prev-address {
 	background-color: #4ebaa7; /* Green */
-	border: 0 none;
+	border: 0;
 	color: #fff;
 	height:100%;
-	padding: 0 32px;
+	padding: 0 3%;
 	text-decoration: none;
 	display: block;
 	font-size: 16px;
@@ -41,7 +41,7 @@ html, body {
    
 #address-label {
 	color: black;
-	line-height: 60px;
+	vertical-align: middle;
 	text-align: center;
 	text-decoration: none;
 	font-size: 16px;
@@ -49,10 +49,10 @@ html, body {
    
 #next-address {
 	background-color: #4ebaa7; /* Green */
-	border: 0 none;
+	border: 0;
 	color: #fff;
 	height:100%;
-	padding: 0 32px;
+	padding: 0 3%;
 	text-decoration: none;
 	display: block;
 	font-size: 16px;
@@ -62,7 +62,7 @@ html, body {
    
 #map {
 	position:absolute;
-	top:60px;
+	top:4%;
 	right:0;
 	left:0;
 	bottom: 0;
@@ -75,55 +75,67 @@ html, body {
 	top:0;
 	bottom:0;
 	right:0;
-	overflow: hidden;
+	overflow: auto;
+}
+
+#addresses{
+  position:absolute;
+  top: 1%;
+  left:40%;
 }
 
 #address_text_area {
-	float: top;
+	/*float: top;*/
+	position: absolute;
 	margin-left: 10%;
-	margin-right: 10%;
+	top:4%;
+	/*margin-right: 10%;*/
 	bottom: 40%;
-	height: 20%;
+	height: 45%;
 	width: 80%;
 }
 
 #load-addresses {
-	float: top;
+	position: absolute;
 	margin-left: 10%;
-	margin-top: 5%;
+	top: 51%;
 	background-color: #e58447; /* Orange */
-	border: 0 none;
 	color: #fff;
-	padding: 0 32px;
 	text-decoration: none;
 	display: block;
-	font-size: 16px;
-	height:120px:;
-	width:85%;
+	font-size: 100%;
+	height:5%;
+	width:82%;
 	left:0;
 	right:0;
 }
 
+#output{
+  position:absolute;
+  top: 57%;
+  left:43%;
+}
+
 #output_text_area {
+	position: absolute;
+	top:60% ;
 	margin-left: 10%;
-	margin-right: 10%;
+	/*margin-right: 10%;*/
 	bottom:0;
-	height:20%;
+	height:31.5%;
 	width: 80%;
 }
 
 #generate-output {
-	float: top;
+  position: absolute;
+  top: 93.5%;
 	margin-left: 10%;
-	margin-top: 5%;
 	background-color: #e58447; /* Orange */
-	border: 0 none;
 	color: #fff;
-	padding: 0 32px;
 	text-decoration: none;
 	display: block;
-	font-size: 16px;
-	height:120px:;
-	width:85%;
+	font-size: 100%;
+	height:5%;
+	width:82%;
 	left:0;right:0;
 }
