@@ -5,7 +5,7 @@
 			lat: 34.020573,
 			lng: -118.285414
 		},
-		zoom: 20,
+		zoom: 15,
 		mapTypeId: google.maps.MapTypeId.SATELLITE, 
 		minZoom: 9,
 		zoomControlOptions: {

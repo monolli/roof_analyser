@@ -6,8 +6,24 @@
     function Mapster(element,opts){
       this.gMap = new google.maps.Map(element,opts);
     }
+    
     //other custom functions
     Mapster.prototype = {
+      
+      //map center get/set
+      
+      center: function(opts){
+        opts.center = {
+          lat: opts.lat,
+          lng: opts.lng
+        };
+        if(opts){
+          this.gMap.setCenter(opts);
+        }else{
+          return this.gMap.getCenter();
+        }
+      },
+      
       //zoom get/set
       zoom: function(level){
         if(level){
@@ -22,10 +38,23 @@
         google.maps.event.addListener(this.gMap,event,function(e){
           callback.call(self,e);
         });
-      }
+      },
+      
+      addMarker: function(opts){
+        opts.position = {
+          lat: opts.lat,
+          lng: opts.lng
+        };
+        this._createMarker(opts);
+      },
+      
+      _createMarker:function(opts){
+        opts.map = this.gMap;
+        return new google.maps.Marker(opts);
+      },
+      
     };
     return Mapster;
-    
   }());
   //map creator
   Mapster.create = function(element,opts) {
