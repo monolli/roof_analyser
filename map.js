@@ -78,7 +78,7 @@ function initDrawing(){
         fillColor: '#E58447', //orange
         strokeColor: '#333333', //drak grey
         strokeWeight: 1,
-        fillOpacity: 0.4,
+        fillOpacity: 0.8,
         editable: true
     };
 // Creates a drawing manager for drawing polygons
