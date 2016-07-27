@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!--
+Lucas Monteiro de Oliveira
+Summer 2016
+Tab == 4 spaces
+-->
+<html lang="en-US">
+	<head>
+		<title>Chai Photovoltaic Roof Analyser</title>
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+
+	
+	<body style="margin:0;background-color:gray;color:white">
+	  
+		<div id="left-section">
+			<div id="navigation-bar">
+				<button id="prev-address" type="button" class="btn btn-primary">Prev (a)</button>
+				<label id="address-label">No Address Selected</label>        
+				<button id="next-address" type="button" class="btn btn-primary">Next (d)</button>
+			</div>
+			<div id="map"></div>
+		</div>
+		<div id="right-section">
+		  <div id="addresses">Addresses:</div>
+			<textarea id="address_text_area" name="address" form="usrform">4213 Scandia Way Los Angeles CA</textarea>  
+			<br>
+			<button id="load-addresses" type="button" class="btn btn-primary">Load Addresses</button>
+			<div id="output">Output:</div>
+			<textarea id="output_text_area" name="output" form="usrform"></textarea>
+			<button id="generate-output" type="button" class="btn btn-primary">Generate Output</button>
+		</div>
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing"></script>
+	  <script src="map.js"></script>
+	</body>
+</html>
