@@ -24,7 +24,7 @@ function initMap(){
     	},
     	zoom: 15,
     	mapTypeId: google.maps.MapTypeId.SATELLITE, 
-    	minZoom: 9,
+    	minZoom: 13,
     	zoomControlOptions: {
     	    position: google.maps.ControlPosition.LEFT_BOTTOM,
     	    style: google.maps.ZoomControlStyle.SMALL
@@ -90,12 +90,6 @@ function initDrawing(){
                 google.maps.drawing.OverlayType.POLYGON
             ]
         },
-        markerOptions: {
-            draggable: true
-        },
-        polylineOptions: {
-            editable: true
-        },
         polygonOptions: polyOptions,
         map: map
     });
@@ -116,6 +110,5 @@ initDrawing();
 
 //create an action for the "Load Address" button
 document.getElementById('load-addresses').addEventListener('click', function() {
-    geocodeAddress(geocoder, map);
+  geocodeAddress(geocoder, map);
 });
-
