@@ -43,6 +43,7 @@ function initMap(){
 
 //create a google geocoder
 var geocoder = new google.maps.Geocoder();
+
 //Function: geocodeAddress(geocoder,resultMap)
 //Purpose:	show the map location according to the given address
 //Parameters:	the API geocoder and the map variable that is being used

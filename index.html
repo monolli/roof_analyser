@@ -24,12 +24,20 @@ Tab == 4 spaces
 			<div id="map"></div>
 		</div>
 		<div id="right-section">
+		  <button id="import" type="button" class="btn btn-primary">Import Data</button>
 		  <div id="addresses">Addresses:</div>
 			<textarea id="address_text_area" name="address" form="usrform">4213 Scandia Way Los Angeles CA</textarea>  
 			<br>
 			<button id="load-addresses" type="button" class="btn btn-primary">Load Addresses</button>
-			<div id="output">Output:</div>
-			<textarea id="output_text_area" name="output" form="usrform"></textarea>
+			<div id="form">
+			<form>
+			<input type="checkbox" name="degree" value="30">30°
+			<input type="checkbox" name="degree" value="40">40°
+			<input type="checkbox" name="degree" value="50">50°
+			<input type="checkbox" name="degree" value="60">60°
+			<input type="checkbox" name="degree" value="70">70°
+			</form>
+			</div>
 			<button id="generate-output" type="button" class="btn btn-primary">Generate Output</button>
 		</div>
     <script src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing"></script>
