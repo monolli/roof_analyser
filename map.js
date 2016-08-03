@@ -1,8 +1,12 @@
 /*
 Lucas Monteiro de Oliveira
+E-mail:lumonoli@hotmail.com
+Henrique Teixeira Oliveira
+E-mail: henrique@gmail.com
 Summer 2016
-Tab == 4 spaces
+Project Chai Energy
 */
+
 
 //Global variables
 var map;
@@ -10,7 +14,6 @@ var selections = [];
 var area = [];
 
 
-//#MAP_CREATION #START
 //Function: initMap()
 //Purpose:	create a standard map object
 //Parameters:	none
@@ -35,10 +38,9 @@ function initMap(){
     //create the map object
     map = new google.maps.Map(element,map_options);
 }
-//#MAP_CREATION #END
 
+//-----------------------------------------------------------------------//
 
-//#GEOCODE #START
 //create a google geocoder
 var geocoder = new google.maps.Geocoder();
 //Function: geocodeAddress(geocoder,resultMap)
@@ -61,10 +63,8 @@ function geocodeAddress(geocoder,resultMap) {
         }
     });
 }
-//#GEOCODE #END
+//-----------------------------------------------------------------------//
 
-
-//#DRAWING_TOOL #START
 //Function: initDrawing()
 //Purpose:	initialize the drawing tool
 //Parameters:	none
@@ -99,26 +99,23 @@ function initDrawing(){
   });
   
 }
-//#DRAWING_TOOL #END
 
+//-----------------------------------------------------------------------//
 
-//#CALC_AREA #START
 //Function: calc_area()
 //Purpose:	calc and store the area of every polygon
 //Parameters:	none
 //Returns:	nothing
+
 function calc_area(){
   //window.alert(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
   area.push(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
   //window.alert(area);
 }
-//#CALC_AREA #END
 
+//-----------------------------------------------------------------------//
 
-
-
-//                              Commands
-//----------------------------------------------------------------------------//
+//-------------------------------COMMANDS--------------------------------//
 
 //run the function and initialyze the map
 initMap();
