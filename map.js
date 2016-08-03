@@ -115,6 +115,74 @@ function calc_area(){
 
 //-----------------------------------------------------------------------//
 
+//Function:   ArcTanDeg()
+//Purpose:	  Calculate the arctangent and return the angle in degrees
+//Parameters: The tangent value of the triangle 
+//Returns:    Angle in degrees
+function ArcTanDeg(x) {  
+  var deg = Math.atan(x)  * 180 / Math.PI;
+  return deg;
+}
+
+//-----------------------------------------------------------------------//
+
+//Function:   TanDeg()
+//Purpose:	  Calculate the tangent of the triangule
+//Parameters: Angle in degrees 
+//Returns:    Tangente value 
+function TanDeg(Angle) {
+//Input (slope): Angle value in degrees
+//Output: The angle the line in degrees. 
+  var deg = Math.tan(Angle * Math.PI / 180);
+  return deg;
+}
+
+//-----------------------------------------------------------------------//
+
+//Function:   ArcTanDeg()
+//Purpose:	  Calculate the arctangent and return the angle in degrees
+//Parameters: The tangent value of the triangle 
+//Returns:    Angle in degrees
+function ArcCosDeg(x) { 
+  var deg = Math.acos(x)  * 180 / Math.PI;
+  return deg;
+}
+
+//-----------------------------------------------------------------------//
+
+//Function:   TanDeg()
+//Purpose:	  Calculate the tangent of the triangule
+//Parameters: Angle in degrees 
+//Returns:    Tangente value 
+function CosDeg(Angle) {   
+  var deg = Math.cos(Angle * Math.PI / 180);
+  return deg;
+}
+
+//-----------------------------------------------------------------------//
+
+//Function:   ArcTanDeg()
+//Purpose:	  Calculate the arctangent and return the angle in degrees
+//Parameters: The tangent value of the triangle 
+//Returns:    Angle in degrees
+function ArcSinDeg(x) {  
+  var deg = Math.asin(x)  * 180 / Math.PI;
+  return deg;
+}
+
+//-----------------------------------------------------------------------//
+
+//Function:   TanDeg()
+//Purpose:	  Calculate the tangent of the triangule
+//Parameters: Angle in degrees 
+//Returns:    Tangente value 
+function SinDeg(Angle) { 
+  var deg = Math.sin(Angle * Math.PI / 180);
+  return deg;
+}
+
+//-----------------------------------------------------------------------//
+
 //-------------------------------COMMANDS--------------------------------//
 
 //run the function and initialyze the map
