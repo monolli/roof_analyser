@@ -6,8 +6,8 @@ Tab == 4 spaces
 
 //Global variables
 var map;
-
-
+var selections = [];
+var area = [];
 
 
 //#MAP_CREATION #START
@@ -38,8 +38,6 @@ function initMap(){
 //#MAP_CREATION #END
 
 
-
-
 //#GEOCODE #START
 //create a google geocoder
 var geocoder = new google.maps.Geocoder();
@@ -66,35 +64,55 @@ function geocodeAddress(geocoder,resultMap) {
 //#GEOCODE #END
 
 
-
-
 //#DRAWING_TOOL #START
 //Function: initDrawing()
 //Purpose:	initialize the drawing tool
 //Parameters:	none
 //Returns:	nothing
 function initDrawing(){
-    var polyOptions = {
-        fillColor: '#E58447', //orange
-        strokeColor: '#333333', //drak grey
-        strokeWeight: 1,
-        fillOpacity: 0.8,
-        editable: true
-    };
-// Creates a drawing manager for drawing polygons
-    drawingManager = new google.maps.drawing.DrawingManager({
-        //null == starts with dragging tool
-        drawingMode: google.maps.drawing.OverlayType.null,
-        drawingControlOptions: {    //show only the polygon tool
-            drawingModes: [
-                google.maps.drawing.OverlayType.POLYGON
-            ]
-        },
-        polygonOptions: polyOptions,
-        map: map
-    });
+  var polyOptions = {
+      fillColor: '#E58447', //orange
+      strokeColor: '#333333', //drak grey
+      strokeWeight: 1,
+      fillOpacity: 0.8,
+      editable: true
+  };
+  // Creates a drawing manager for drawing polygons
+  drawingManager = new google.maps.drawing.DrawingManager({
+      //null == starts with dragging tool
+      drawingMode: google.maps.drawing.OverlayType.null,
+      drawingControlOptions: {    //show only the polygon tool
+          drawingModes: [
+              google.maps.drawing.OverlayType.POLYGON
+          ]
+      },
+      polygonOptions: polyOptions,
+      map: map
+  });
+  
+  google.maps.event.addListener(drawingManager, 'overlaycomplete', function(polygon) {
+    var coordinatesArray = polygon.overlay.getPath().getArray();
+    selections.push(coordinatesArray);
+    //window.alert(selections);
+    calc_area();
+    //window.alert(coordinatesArray[1].lat());
+  });
+  
 }
 //#DRAWING_TOOL #END
+
+
+//#CALC_AREA #START
+//Function: calc_area()
+//Purpose:	calc and store the area of every polygon
+//Parameters:	none
+//Returns:	nothing
+function calc_area(){
+  //window.alert(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
+  area.push(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
+  //window.alert(area);
+}
+//#CALC_AREA #END
 
 
 
