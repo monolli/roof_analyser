@@ -189,9 +189,6 @@ function SinDeg(Angle) {
 //Parameters: Polygon that you want to calculate
 //Returns:    The roof orientation in degrees 
 function Orientation (numPoly) {
-// Input_1 (Lat): Array with values of latitude for a polygon.
-// Input_2 (Lng): Array with values of longitude for a polygon.
-// Output: Roof orientation (Surface Azimuth Angle [degrees])
     
     var deltaLat = selections[numPoly][0].lat() - selections[numPoly][1].lat();   
     // Difference between the latitude of two points at the same height.
@@ -280,6 +277,19 @@ function Orientation (numPoly) {
 return orient;
 }
 
+//Function:   Sigma (day)
+//Purpose:	  Calculate the roof orientation in degrees (Azimuth Angle)
+//Parameters: Day of the year (e.i. January 15th - Day = 15 // February 7th = Day = 31 + 7 = 38)
+//Returns:    The sun declination in degrees. 
+function Sigma (day) {
+    
+    var B = ((day-1)*(360/365))*(Math.PI/180);
+    var sigma =  (180/Math.PI)*(0.006918                             
+                    -0.399912*CosDeg(B)+0.070257*SinDeg(B)
+                    -0.006758*CosDeg(2*B)+0.000907*SinDeg(2*B)
+                    -0.002697*CosDeg(3*B)+0.00148*SinDeg(3*B)); 
+    return sigma;
+}
 
 //-------------------------------COMMANDS--------------------------------//
 
@@ -295,6 +305,8 @@ document.getElementById('load-addresses').addEventListener('click', function() {
 });
 
 document.getElementById('generate-output').addEventListener('click', function() {
-  var Orient = Orientation (1);
-  console.log(Orient);             //test-function - not done already
+  for (var i = 0; i < selections.length; i++) {
+    var Orient = Orientation (i);
+    console.log(Orient);             //test-function - not done already
+  }
 });
