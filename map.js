@@ -140,8 +140,8 @@ function TanDeg(Angle) {
 //-----------------------------------------------------------------------//
 
 //Function:   ArcTanDeg()
-//Purpose:	  Calculate the arctangent and return the angle in degrees
-//Parameters: The tangent value of the triangle 
+//Purpose:	  Calculate the arccossine and return the angle in degrees
+//Parameters: The cossine value of the triangle 
 //Returns:    Angle in degrees
 function ArcCosDeg(x) { 
   var deg = Math.acos(x)  * 180 / Math.PI;
@@ -150,8 +150,8 @@ function ArcCosDeg(x) {
 
 //-----------------------------------------------------------------------//
 
-//Function:   TanDeg()
-//Purpose:	  Calculate the tangent of the triangule
+//Function:   CosDeg()
+//Purpose:	  Calculate the cossine of the triangule
 //Parameters: Angle in degrees 
 //Returns:    Tangente value 
 function CosDeg(Angle) {   
@@ -162,8 +162,8 @@ function CosDeg(Angle) {
 //-----------------------------------------------------------------------//
 
 //Function:   ArcTanDeg()
-//Purpose:	  Calculate the arctangent and return the angle in degrees
-//Parameters: The tangent value of the triangle 
+//Purpose:	  Calculate the arcsine and return the angle in degrees
+//Parameters: The sine value of the triangle 
 //Returns:    Angle in degrees
 function ArcSinDeg(x) {  
   var deg = Math.asin(x)  * 180 / Math.PI;
@@ -172,8 +172,8 @@ function ArcSinDeg(x) {
 
 //-----------------------------------------------------------------------//
 
-//Function:   TanDeg()
-//Purpose:	  Calculate the tangent of the triangule
+//Function:   SinDeg()
+//Purpose:	  Calculate the sine of the triangule
 //Parameters: Angle in degrees 
 //Returns:    Tangente value 
 function SinDeg(Angle) { 
@@ -182,6 +182,103 @@ function SinDeg(Angle) {
 }
 
 //-----------------------------------------------------------------------//
+
+//Function:   Orientation (numPoly)
+//Purpose:	  Calculate the roof orientation in degrees (Azimuth Angle)
+//Parameters: Polygon that you want to calculate
+//Returns:    The roof orientation in degrees 
+function Orientation (numPoly) {
+// Input_1 (Lat): Array with values of latitude for a polygon.
+// Input_2 (Lng): Array with values of longitude for a polygon.
+// Output: Roof orientation (Surface Azimuth Angle [degrees])
+    
+    var deltaLat = selections[numPoly][0].lat() - selections[numPoly][1].lat();   
+    // Difference between the latitude of two points at the same height.
+    var deltaLng = selections[numPoly][0].lng() - selections[numPoly][1].lng();      
+    // Difference between the longitude of two points at the same height.
+    
+    // To get the point that represents the opositive side of the roof orientation.
+    if (selections[numPoly].length === 3 || selections[numPoly].length === 4) {
+        var midLat = selections[numPoly][2].lat();
+        var midLng = selections[numPoly][2].lng(); 
+    }
+    else if (selections[numPoly].length % 2 === 1) {    // lenght is odd
+        var midLat = selections[numPoly][Lat.length/2 + 0.5].lat();
+        var midLng = selections[numPoly][Lng.length/2 + 0.5].lng(); 
+    }
+    else {                              // lenght is even
+        var midLat = selections[numPoly][Lat.length/2].lat();
+        var midLng = selections[numPoly][Lng.length/2].lng(); 
+    }
+    
+    // A auxiliar line will be created to make the calculations more simple  (y = slope*x + inter)
+    // Where "y" represents Latitude and "x" represents Longitude.
+    if (deltaLng === 0) {   
+        var slopeAngle = 90;     
+        // To avoid errors by zero division
+    }
+    else {
+        var slope = deltaLat/deltaLng;          
+        // line slope (a = deltaLat/deltaLng)
+        var inter = selections[numPoly][0].lat() - slope*selections[numPoly][1].lng();      
+        // line interssection  (inter = y - slope*x) 
+        var slopeAngle = ArcTanDeg(slope);       
+        // Perperdicular angle of the roof orientation
+        var projY = slope * midLng + inter;     
+        // ProjY is responsible to indicate the orientation based on the perpendicular angle
+    }
+    
+        if (slopeAngle > 0 && slopeAngle < 90) {
+        
+        if (midLat > projY) {       
+            // South East Orientation -> Azimuth Angle:  Between -90 and 0 degrees
+            var orient = -slopeAngle;
+        }
+        else if (midLat < projY) {  
+            // North West Orientation -> Azimuth Angle: Between 90 and 180 degrees
+            var orient = 90 + (90 - slopeAngle);
+        }
+    }
+    
+    else if (slopeAngle < 0 && slopeAngle > -90) {
+        
+        if (midLat > projY) {  //WARNING: In this case the slope is negative     
+            // South West Orientation -> Azimuth Angle:  Between 0 and 90 degrees
+            var orient = -slopeAngle;
+        }
+        else if (midLat < projY) {  //WARNING: In this case the slope is negative
+            // North East Orientation -> Azimuth Angle: Between -90 and 180 degrees
+            var orient = -(90 + (90 + slopeAngle));
+        }
+    }
+    
+    else if (slopeAngle === 0){
+        
+        if (midLat > selections[numPoly][0].lat()) {      
+            // South Orientation -> Azimuth Angle = 0 degrees
+            var orient = 0;
+        }
+        else if (midLat < selections[numPoly][0].lat()) {
+            // North Orientation -> Azimuth Angle = 180 degrees
+            var orient = 180;
+        }        
+    }
+    
+    else if (slopeAngle === 0){
+        
+        if (midLng > selections[numPoly][0].lng()) {      
+            // West Orientation -> Azimuth Angle = 90 degrees
+            var orient = 90;
+        }
+        else if (midLng < selections[numPoly][0].lng()) { 
+            // East Orientation -> Azimuth Angle = -90 degrees
+            var orient = -90;
+        }        
+    }
+    
+return orient;
+}
+
 
 //-------------------------------COMMANDS--------------------------------//
 
@@ -194,4 +291,9 @@ initDrawing();
 //create an action for the "Load Address" button
 document.getElementById('load-addresses').addEventListener('click', function() {
   geocodeAddress(geocoder, map);
+});
+
+document.getElementById('generate-output').addEventListener('click', function() {
+  var Orient = Orientation (1);
+  console.log(Orient);             //test-function - not done already
 });
