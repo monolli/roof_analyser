@@ -97,6 +97,7 @@ function initDrawing(){
     //window.alert(selections);
     calc_area();
     //window.alert(coordinatesArray[1].lat());
+    window.alert(area)
   });
   
 }
@@ -218,7 +219,7 @@ function Orientation (numPoly) {
     else {
         var slope = deltaLat/deltaLng;          
         // line slope (a = deltaLat/deltaLng)
-        var inter = selections[numPoly][0].lat() - slope*selections[numPoly][1].lng();      
+        var inter = selections[numPoly][0].lat() - slope*selections[numPoly][0].lng();      
         // line interssection  (inter = y - slope*x) 
         var slopeAngle = ArcTanDeg(slope);       
         // Perperdicular angle of the roof orientation
@@ -277,10 +278,12 @@ function Orientation (numPoly) {
 return orient;
 }
 
+//-----------------------------------------------------------------------//
+
 //Function:   Sigma (day)
 //Purpose:	  Calculate the roof orientation in degrees (Azimuth Angle)
 //Parameters: Day of the year (e.i. January 15th - Day = 15 // February 7th = Day = 31 + 7 = 38)
-//Returns:    The sun declination in degrees. 
+//Returns:    . 
 function Sigma (day) {
     
     var B = ((day-1)*(360/365))*(Math.PI/180);
@@ -289,6 +292,143 @@ function Sigma (day) {
                     -0.006758*CosDeg(2*B)+0.000907*SinDeg(2*B)
                     -0.002697*CosDeg(3*B)+0.00148*SinDeg(3*B)); 
     return sigma;
+}
+
+//-----------------------------------------------------------------------//
+
+//Function: SunShine (numPoly, sigma)
+//Purpose: Calculate the sunset hour.
+//Parameters: Polygon that you want to calculate (NumPoly) and the sun declination
+//Returns: Sunset hour [h]
+function SunShine (numPoly, sigma) {
+    var wShine = -ArcCosDeg(-TanDeg(selections[numPoly][0].lat())*TanDeg(sigma));
+    // Sunshine hour angle [degrees]
+    var hourShine = 12 + wShine/15;                             
+    // Sunshine hour [hour]
+    return hourShine;                    
+}
+
+//-----------------------------------------------------------------------//
+
+//Function: SunSet (numPoly, sigma)
+//Purpose: Calculate the sunset hour.
+//Parameters: Polygon that you want to calculate (NumPoly) and the sun declination (sigma)
+//Returns: Sunset hour [h]
+function SunSet (numPoly, sigma){
+    var wSet = ArcCosDeg(-TanDeg(selections[numPoly][0].lat())*TanDeg(sigma));      
+    // Sunset hour angle [degrees]  
+    var hourSet = 12 + wSet/15;                                   
+    // Sunset hour [hour]   WARNING: THE VALUE OF wSET is NEGATIVE
+    return hourSet;
+}
+
+//-----------------------------------------------------------------------//
+
+//Function: TetaZ (numPoly,sigma,hour)
+//Purpose: Calculate the angle difference between the sun radiation vector and the ground.
+//Parameters: Polygon that you want to calculate (NumPoly) and the sun declination (sigma),
+//and the current time (hour)
+//Returns: Solar radiance angle [degrees]
+function TetaZ (numPoly,sigma,hour){
+    
+    var w1 = (hour-12)*15;
+    var tetaZ = ArcCosDeg(CosDeg(selections[numPoly][0].lat())*CosDeg(sigma)*CosDeg(w1)
+                +SinDeg(selections[numPoly][0].lat())*SinDeg(sigma));
+    return tetaZ;
+    
+}
+
+//-----------------------------------------------------------------------//
+
+//Function: Teta (numPoly, sigma, gama, tilt, hour)
+//Purpose: Calculate the angle difference between the sun radiation vector and the roof normal vector.
+//Parameters: Polygon that you want to calculate (NumPoly) and the sun declination (sigma),
+//the roof orientation (gama), roof tilt value, and the current time (hour).
+//Returns: Irradiance roof angle [degrees]
+function Teta (numPoly, sigma, gama, tilt, hour) {
+
+    var w1 = (hour-12)*15;     
+    var w2 = w1 + 7.5;
+
+    var teta = ArcCosDeg(SinDeg(sigma)*SinDeg(selections[numPoly][0].lat())*CosDeg(tilt)
+                -SinDeg(sigma)*CosDeg(selections[numPoly][0].lat())*SinDeg(tilt)*CosDeg(gama)
+                +CosDeg(sigma)*CosDeg(selections[numPoly][0].lat())*CosDeg(tilt)*CosDeg(w1)
+                +CosDeg(sigma)*SinDeg(selections[numPoly][0].lat())*SinDeg(tilt)*CosDeg(gama)*CosDeg(w1)
+                +CosDeg(sigma)*SinDeg(tilt)*SinDeg(gama)*SinDeg(w1));
+    return teta;
+    
+}
+
+//-----------------------------------------------------------------------//
+
+//Function: Io (numPoly, sigma, day, hour)
+//Purpose:	Calculate the extraterrestrial radiantion on a horizontal surface to be compared
+//to weather data.
+//Parameters: Polygon that you want to calculate (NumPoly) and the sun declination (sigma),
+//and the current day and time (hour).
+//Returns:	Extraterrestrial radiation on a horizontal surface [MJ/m2]
+function Io (numPoly, sigma, day, hour){
+    
+    var w1 = (hour-12)*15;     
+    var w2 = w1 + 7.5;
+    
+    var Gsc = 1367;     //Solar constant [W/m^2]
+    
+    var io = ((12*3600/Math.PI)*Gsc*(1+0.033*CosDeg(360*day/365))
+            *(CosDeg(selections[numPoly][0].lat())*CosDeg(sigma)*(SinDeg(w2)-SinDeg(w1))
+            +(Math.PI*(w2-w1)/180)*SinDeg(selections[numPoly][0].lat())*SinDeg(sigma)))/1000000;
+    return io;
+    // Io = Extraterrestrial radiation on a horizontal surface [MJ/m2] 
+}
+
+//Function: Io (numPoly, sigma, day, hour)
+//Purpose:	Calculate the diffused irradiation, which is one of the parameters
+//for the total roof radiation
+//to wethear data.
+//Parameters: Global horizontal radiation (GHI - weather data) and extraterrestrial 
+//radiation on a horizontal surface
+//Returns:	Diffused radiation [MJ/m2]
+
+function Id_fun (I, Io){
+    
+    if (I > Io) {
+        var kT = 1;
+    }
+    else {
+        var kT = I/Io;
+    }
+    
+    if (kT <= 0.22) {
+        var id =(1.0 - 0.09*kT) * I;    // Equation 2.10.1 - Page 76
+    }                                       
+    else if (kT > 0.22 || kT <= 0.80) {
+        var id = (0.9511 - 0.1604*kT + 4.388*kT^2 - 16.638*kT^3 + 12.336*kT^4) * I;  // Equation 2.10.1 - Page 76
+    }    
+    else if (kT > 0.8) {
+        var id = 0.165;     // Equation 2.10.1 - Page 76
+    }    
+    
+    return id;
+}
+
+//Function: Itilt (tilt, hour, sunshine, sunset, Ib, Rb, Id, I, rho_g)
+//Purpose:	Calculates the total radiation on the tilted roof.
+//Parameters:	Tilt Angle (tilt), currently hour (hour), sunshine and sunset times (sunshine and sunset)
+//, beam radiation, ratio between horizontal and tilt roofs, diffused irradiation, GHI (wheather data), and 
+// diffused ground reflectance.
+//Returns:	Total irradiation on a tilted plane (time interval) 
+function Itilt (tilt, hour, sunshine, sunset, Ib, Rb, Id, I, rho_g){
+    
+    if (tilt < 0 || tilt > 90 || hour < sunshine || hour > sunset){
+        var I_Tilt = 0;         
+    }
+    else {
+        var I_Tilt = Ib*Rb
+                        +Id*((1+CosDeg(tilt))/2)
+                        +I*rho_g*((1-CosDeg(tilt))/2);
+    }
+    return I_Tilt;
+    //Total irradiation on a tilted plane (time interval)    
 }
 
 //-------------------------------COMMANDS--------------------------------//
