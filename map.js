@@ -49,7 +49,7 @@ var geocoder = new google.maps.Geocoder();
 //Parameters:	the API geocoder and the map variable that is being used
 //Returns:	an alert if the status is != OK or the cropped map
 function geocodeAddress(geocoder,resultMap) {
-    var address = document.getElementById('address_text_area').value;
+	var address = document.getElementById('address_text_area').value;
     geocoder.geocode({'address': address}, function(results, status) {
         if (status === google.maps.GeocoderStatus.OK) {
             //set the target coordinates and the zoom in the roof
@@ -60,7 +60,7 @@ function geocodeAddress(geocoder,resultMap) {
             resultMap.setZoom(20);
             
         } else {
-            window.alert('Geocode was not successful for the following reason: ' + status);
+        	window.alert('Geocode was not successful for the following reason: ' + status);
         }
     });
 }
@@ -71,35 +71,34 @@ function geocodeAddress(geocoder,resultMap) {
 //Parameters:	none
 //Returns:	nothing
 function initDrawing(){
-  var polyOptions = {
-      fillColor: '#E58447', //orange
-      strokeColor: '#333333', //drak grey
-      strokeWeight: 1,
-      fillOpacity: 0.8,
-      editable: true
-  };
-  // Creates a drawing manager for drawing polygons
-  drawingManager = new google.maps.drawing.DrawingManager({
-      //null == starts with dragging tool
-      drawingMode: google.maps.drawing.OverlayType.null,
-      drawingControlOptions: {    //show only the polygon tool
-          drawingModes: [
-              google.maps.drawing.OverlayType.POLYGON
-          ]
-      },
-      polygonOptions: polyOptions,
-      map: map
-  });
+	var polyOptions = {
+		fillColor: '#E58447', //orange
+		strokeColor: '#333333', //drak grey
+		strokeWeight: 1,
+		fillOpacity: 0.8,
+		editable: true
+	};
+	// Creates a drawing manager for drawing polygons
+	drawingManager = new google.maps.drawing.DrawingManager({
+		//null == starts with dragging tool
+		drawingMode: google.maps.drawing.OverlayType.null,
+		drawingControlOptions: {    //show only the polygon tool
+			drawingModes: [
+				google.maps.drawing.OverlayType.POLYGON
+			]
+		},
+		polygonOptions: polyOptions,
+		map: map
+	});
   
-  google.maps.event.addListener(drawingManager, 'overlaycomplete', function(polygon) {
-    var coordinatesArray = polygon.overlay.getPath().getArray();
-    selections.push(coordinatesArray);
-    //window.alert(selections);
-    calc_area();
-    //window.alert(coordinatesArray[1].lat());
-    window.alert(area)
-  });
-  
+	google.maps.event.addListener(drawingManager, 'overlaycomplete', function(polygon) {
+		var coordinatesArray = polygon.overlay.getPath().getArray();
+		selections.push(coordinatesArray);
+		//window.alert(selections);
+		calc_area();
+		//window.alert(coordinatesArray[1].lat());
+		//window.alert(area)
+	});
 }
 
 //-----------------------------------------------------------------------//
@@ -110,9 +109,9 @@ function initDrawing(){
 //Returns:	nothing
 
 function calc_area(){
-  //window.alert(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
-  area.push(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
-  //window.alert(area);
+	//window.alert(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
+	area.push(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
+	//window.alert(area);
 }
 
 //-----------------------------------------------------------------------//
@@ -122,8 +121,8 @@ function calc_area(){
 //Parameters: The tangent value of the triangle 
 //Returns:    Angle in degrees
 function ArcTanDeg(x) {  
-  var deg = Math.atan(x)  * 180 / Math.PI;
-  return deg;
+	var deg = Math.atan(x)  * 180 / Math.PI;
+	return deg;
 }
 
 //-----------------------------------------------------------------------//
@@ -135,8 +134,8 @@ function ArcTanDeg(x) {
 function TanDeg(Angle) {
 //Input (slope): Angle value in degrees
 //Output: The angle the line in degrees. 
-  var deg = Math.tan(Angle * Math.PI / 180);
-  return deg;
+	var deg = Math.tan(Angle * Math.PI / 180);
+	return deg;
 }
 
 //-----------------------------------------------------------------------//
@@ -146,8 +145,8 @@ function TanDeg(Angle) {
 //Parameters: The cossine value of the triangle 
 //Returns:    Angle in degrees
 function ArcCosDeg(x) { 
-  var deg = Math.acos(x)  * 180 / Math.PI;
-  return deg;
+	var deg = Math.acos(x)  * 180 / Math.PI;
+	return deg;
 }
 
 //-----------------------------------------------------------------------//
@@ -157,8 +156,8 @@ function ArcCosDeg(x) {
 //Parameters: Angle in degrees 
 //Returns:    Tangente value 
 function CosDeg(Angle) {   
-  var deg = Math.cos(Angle * Math.PI / 180);
-  return deg;
+	var deg = Math.cos(Angle * Math.PI / 180);
+	return deg;
 }
 
 //-----------------------------------------------------------------------//
@@ -168,8 +167,8 @@ function CosDeg(Angle) {
 //Parameters: The sine value of the triangle 
 //Returns:    Angle in degrees
 function ArcSinDeg(x) {  
-  var deg = Math.asin(x)  * 180 / Math.PI;
-  return deg;
+	var deg = Math.asin(x)  * 180 / Math.PI;
+	return deg;
 }
 
 //-----------------------------------------------------------------------//
@@ -179,8 +178,8 @@ function ArcSinDeg(x) {
 //Parameters: Angle in degrees 
 //Returns:    Tangente value 
 function SinDeg(Angle) { 
-  var deg = Math.sin(Angle * Math.PI / 180);
-  return deg;
+	var deg = Math.sin(Angle * Math.PI / 180);
+	return deg;
 }
 
 //-----------------------------------------------------------------------//
@@ -335,7 +334,6 @@ function TetaZ (numPoly,sigma,hour){
     var tetaZ = ArcCosDeg(CosDeg(selections[numPoly][0].lat())*CosDeg(sigma)*CosDeg(w1)
                 +SinDeg(selections[numPoly][0].lat())*SinDeg(sigma));
     return tetaZ;
-    
 }
 
 //-----------------------------------------------------------------------//
@@ -356,7 +354,6 @@ function Teta (numPoly, sigma, gama, tilt, hour) {
                 +CosDeg(sigma)*SinDeg(selections[numPoly][0].lat())*SinDeg(tilt)*CosDeg(gama)*CosDeg(w1)
                 +CosDeg(sigma)*SinDeg(tilt)*SinDeg(gama)*SinDeg(w1));
     return teta;
-    
 }
 
 //-----------------------------------------------------------------------//
@@ -449,7 +446,7 @@ document.getElementById("import").addEventListener('change',function(){
 
 //create an action for the "Load Address" button
 document.getElementById('load-addresses').addEventListener('click', function() {
-  geocodeAddress(geocoder, map);
+	geocodeAddress(geocoder, map);
 }),
 
 document.getElementById('generate-output').addEventListener('click', function() {
@@ -471,7 +468,7 @@ document.getElementById('generate-output').addEventListener('click', function() 
     var Orient = 0;
     
     for (var i = 0; i < selections.length; i++) {
-        Orient = Orientation (i); // i = polygon number that you want to calculate
+    	Orient = Orientation (i); // i = polygon number that you want to calculate
         for (var day = 1; day <= 365; day++) {
             sigma = Sigma (day);
             Hour_Shine = SunShine (i, sigma);
