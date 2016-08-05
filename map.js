@@ -12,6 +12,9 @@ Project Chai Energy
 var map;
 var selections = [];
 var area = [];
+var simAngle = [];
+var csvData = [];
+var colors = ['#00aedb', '#a200ff',	'#f47835', '#d41243', '#8ec127]'];
 
 
 //Function: initMap()
@@ -96,6 +99,8 @@ function initDrawing(){
 		selections.push(coordinatesArray);
 		//window.alert(selections);
 		calc_area();
+		polygon.setOptions({fillColor:'green'}); 
+		// change the fill colour
 		//window.alert(coordinatesArray[1].lat());
 		//window.alert(area)
 	});
@@ -400,7 +405,7 @@ function I_d (I, Io){
     }                                       
     else if (kT > 0.22 || kT <= 0.80) {
         var id = (0.9511 - 0.1604*kT + 4.388*kT^2 - 16.638*kT^3 + 12.336*kT^4) * I;  // Equation 2.10.1 - Page 76
-    }    
+    }
     else if (kT > 0.8) {
         var id = 0.165;     // Equation 2.10.1 - Page 76
     }    
@@ -436,12 +441,55 @@ initMap();
 //run the function and initialyze the drawing tool/manager
 initDrawing();
 
+//button to import the csv containing addresses
 document.getElementById("import").addEventListener('change',function(){
-	var fr = new FileReader();
-	fr.onloadend = function(){
-		window.alert(this.result);
-	}
-	fr.readAsText(this.files[0]);
+	
+	if (window.FileReader) {
+    	// FileReader is supported.
+    	var reader = new FileReader();
+        reader.readAsText(this.files[0]); //import the content as raw text
+        
+        function loadHandler(event) {
+			var csv = event.target.result;
+			processData(csv);
+		}
+     
+		function processData(csv) {
+			var allTextLines = csv.split(/\r\n|\n/);
+			//break the data in lines
+			for (var i=0; i<allTextLines.length; i++) {
+				var data = allTextLines[i].split(',');
+				//separate the cells
+				var tarr =[];
+				for (var j=0; j<data.length; j++) {
+					tarr.push(data[j]);
+				}
+				if(tarr[0]!=''){//not empty
+					csvData.push(tarr);
+				}
+				//console.log(tarr);
+			}
+			//console.log(csvData);
+			//window.alert(csvData);
+		}
+
+		function errorHandler(evt) {
+			if(evt.target.error.name == "NotReadableError") {
+				alert("Cannot read file!");
+			}
+		}
+		
+		// Handle errors load
+        reader.onload = loadHandler;
+		reader.onerror = errorHandler;
+		
+		console.log(csvData);
+
+    } else {
+    	alert('FileReader are not supported in this browser.');
+    }
+	
+	
 }),
 
 //create an action for the "Load Address" button
