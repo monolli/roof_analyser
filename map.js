@@ -367,7 +367,7 @@ function Teta (numPoly, sigma, gama, tilt, hour) {
 //Parameters: Polygon that you want to calculate (NumPoly) and the sun declination (sigma),
 //and the current day and time (hour).
 //Returns:	Extraterrestrial radiation on a horizontal surface [MJ/m2]
-function Io (numPoly, sigma, day, hour){
+function I_o (numPoly, sigma, day, hour){
     
     var w1 = (hour-12)*15;     
     var w2 = w1 + 7.5;
@@ -389,7 +389,7 @@ function Io (numPoly, sigma, day, hour){
 //radiation on a horizontal surface
 //Returns:	Diffused radiation [MJ/m2]
 
-function Id_fun (I, Io){
+function I_d (I, Io){
     
     if (I > Io) {
         var kT = 1;
@@ -445,8 +445,40 @@ document.getElementById('load-addresses').addEventListener('click', function() {
 });
 
 document.getElementById('generate-output').addEventListener('click', function() {
-  for (var i = 0; i < selections.length; i++) {
-    var Orient = Orientation (i);
-    console.log(Orient);             //test-function - not done already
-  }
+    
+    var tilt = 30;
+    var I_Tilt = 0;
+    var rho_g = 0.25;       //Diffuse reflectance  Reference: http://www.simulatedvision.co.uk/V&A_Chap14.pdf
+    var sigma = 0;          
+    var Hour_Shine = 0;
+    var Hour_Set = 0;
+    var teta = 0;
+    var tetaZ = 0;
+    var I = 0;
+    var Io = 0;
+    var Id = 0;
+    var Rb = 0;
+    var Ib = 0;
+    var Itilt = 0;
+    var Orient = 0;
+    
+    for (var i = 0; i < selections.length; i++) {
+        Orient = Orientation (i); // i = polygon number that you want to calculate
+        for (var day = 1; day <= 365; day++) {
+            sigma = Sigma (day);
+            Hour_Shine = SunShine (i, sigma);
+            Hour_Set = SunSet (i, sigma);
+            for (var hour = 0; hour <= 23.5; hour = hour + 0.5){
+                teta = Teta (i, sigma, Orient, tilt, hour); //Check gama
+                tetaZ = TetaZ (i,sigma,hour);
+                I = 50 * 1.8*10^-3;
+                Io = I_o (i, sigma, day, hour);
+                Id = I_d (I, Io);
+                Rb = CosDeg(teta)/CosDeg(tetaZ);
+                Ib = I - Id;
+                Itilt = Itilt (tilt, hour, Hour_Shine, Hour_Set, Ib, Rb, Id, I, rho_g);
+                I_Tilt = I_Tilt + Itilt/3.6;
+            }
+        }         
+    }
 });
