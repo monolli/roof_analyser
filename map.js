@@ -60,7 +60,7 @@ function geocodeAddress(geocoder,resultMap) {
             resultMap.setZoom(20);
             
         } else {
-            alert('Geocode was not successful for the following reason: ' + status);
+            window.alert('Geocode was not successful for the following reason: ' + status);
         }
     });
 }
@@ -439,10 +439,18 @@ initMap();
 //run the function and initialyze the drawing tool/manager
 initDrawing();
 
+document.getElementById("import").addEventListener('change',function(){
+	var fr = new FileReader();
+	fr.onloadend = function(){
+		window.alert(this.result);
+	}
+	fr.readAsText(this.files[0]);
+}),
+
 //create an action for the "Load Address" button
 document.getElementById('load-addresses').addEventListener('click', function() {
   geocodeAddress(geocoder, map);
-});
+}),
 
 document.getElementById('generate-output').addEventListener('click', function() {
     
