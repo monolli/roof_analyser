@@ -390,7 +390,6 @@ function I_o (numPoly, sigma, day, hour){
 //Parameters: Global horizontal radiation (GHI - weather data) and extraterrestrial 
 //radiation on a horizontal surface
 //Returns:	Diffused radiation [MJ/m2]
-
 function I_d (I, Io){
     
     if (I > Io) {
@@ -413,6 +412,27 @@ function I_d (I, Io){
     return id;
 }
 
+function I_data () {
+    var lat = selections[0][0].lat();
+    var lng = selections[0][0].lng();
+    var I = [];
+    var j = 0;
+    var aux = parseInt(csvData[1][1+j])+0.4;
+    var aux2 = parseInt(csvData[1][1+j])-0.4;
+    var aux3= parseInt(csvData[1][2+j])+0.4;
+    var aux4 = parseInt(csvData[1][2+j])-0.4;
+    
+    while ( lat <= parseInt(csvData[1][1+j])+0.4 && lat >= parseInt(csvData[1][1+j])-0.4 &&
+            lng <= parseInt(csvData[1][2+j])+0.4 && lng >= parseInt(csvData[1][2+j])-0.4) {
+            // THE LONGITUDE IS NEGATIVE 
+        for (var i = 0; i < 17520; i++) {
+            I[i] = parseInt(csvData[3+i][6+j]);
+            break;
+        }
+    j = j + 2;
+    }
+    return I;
+}
 //Function: Itilt (tilt, hour, sunshine, sunset, Ib, Rb, Id, I, rho_g)
 //Purpose:	Calculates the total radiation on the tilted roof.
 //Parameters:	Tilt Angle (tilt), currently hour (hour), sunshine and sunset times (sunshine and sunset)
@@ -499,12 +519,12 @@ document.getElementById('load-addresses').addEventListener('click', function() {
 
 document.getElementById('generate-output').addEventListener('click', function() {
     
-    console.log(selections[0][0].lat())
-    console.log(selections[0][0].lng())
-    console.log(selections[0][1].lat())
-    console.log(selections[0][1].lng())
-    console.log(selections[0][2].lat())
-    console.log(selections[0][2].lng())
+    //console.log(selections[0][0].lat())
+    //console.log(selections[0][0].lng())
+    //console.log(selections[0][1].lat())
+    //console.log(selections[0][1].lng())
+    //console.log(selections[0][2].lat())
+    //console.log(selections[0][2].lng())
     
     var tilt = 30;
     var I_Tilt = 0;
@@ -515,7 +535,6 @@ document.getElementById('generate-output').addEventListener('click', function() 
     var Hour_Set = 0;
     var teta = 0;
     var tetaZ = 0;
-    var I = 0;
     var Io = 0;
     var Id = 0;
     var Rb = 0;
@@ -524,6 +543,8 @@ document.getElementById('generate-output').addEventListener('click', function() 
     var Orient = 0;
     var I_inter = 0;
     var k = 0;
+    
+    var I = I_data ();
     
     for (var i = 0; i < selections.length; i++) {
     	Orient = Orientation (i); // i = polygon number that you want to calculate;
