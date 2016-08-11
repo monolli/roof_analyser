@@ -292,9 +292,9 @@ function Sigma (day) {
     
     var B = ((day-1)*(360/365))*(Math.PI/180);
     var sigma =  (180/Math.PI)*(0.006918                             
-                    -0.399912*CosDeg(B)+0.070257*SinDeg(B)
-                    -0.006758*CosDeg(2*B)+0.000907*SinDeg(2*B)
-                    -0.002697*CosDeg(3*B)+0.00148*SinDeg(3*B)); 
+                    -0.399912*Math.cos(B)+0.070257*Math.sin(B)
+                    -0.006758*Math.cos(2*B)+0.000907*Math.sin(2*B)
+                    -0.002697*Math.cos(3*B)+0.00148*Math.sin(3*B)); 
     return sigma;
 }
 
@@ -404,7 +404,7 @@ function I_d (I, Io){
         var id =(1.0 - 0.09*kT) * I;    // Equation 2.10.1 - Page 76
     }                                       
     else if (kT > 0.22 || kT <= 0.80) {
-        var id = (0.9511 - 0.1604*kT + 4.388*kT^2 - 16.638*kT^3 + 12.336*kT^4) * I;  // Equation 2.10.1 - Page 76
+        var id = (0.9511 - 0.1604*kT + 4.388*Math.pow(kT,2) - 16.638*Math.pow(kT,3) + 12.336*Math.pow(kT,4)) * I;  // Equation 2.10.1 - Page 76
     }
     else if (kT > 0.8) {
         var id = 0.165;     // Equation 2.10.1 - Page 76
@@ -499,9 +499,17 @@ document.getElementById('load-addresses').addEventListener('click', function() {
 
 document.getElementById('generate-output').addEventListener('click', function() {
     
+    console.log(selections[0][0].lat())
+    console.log(selections[0][0].lng())
+    console.log(selections[0][1].lat())
+    console.log(selections[0][1].lng())
+    console.log(selections[0][2].lat())
+    console.log(selections[0][2].lng())
+    
     var tilt = 30;
     var I_Tilt = 0;
-    var rho_g = 0.25;       //Diffuse reflectance  Reference: http://www.simulatedvision.co.uk/V&A_Chap14.pdf
+    var rho_g = 0.25;       //Diffuse Reflectance Reference:http://www.simulatedvision.co.uk/V&A_Chap14.pdf
+    
     var sigma = 0;          
     var Hour_Shine = 0;
     var Hour_Set = 0;
@@ -512,26 +520,32 @@ document.getElementById('generate-output').addEventListener('click', function() 
     var Id = 0;
     var Rb = 0;
     var Ib = 0;
-    var Itilt = 0;
+    var I_Tilt = 0;
     var Orient = 0;
+    var I_inter = 0;
+    var k = 0;
     
     for (var i = 0; i < selections.length; i++) {
-    	Orient = Orientation (i); // i = polygon number that you want to calculate
+    	Orient = Orientation (i); // i = polygon number that you want to calculate;
         for (var day = 1; day <= 365; day++) {
             sigma = Sigma (day);
             Hour_Shine = SunShine (i, sigma);
             Hour_Set = SunSet (i, sigma);
             for (var hour = 0; hour <= 23.5; hour = hour + 0.5){
-                teta = Teta (i, sigma, Orient, tilt, hour); //Check gama
+                teta = Teta (i, sigma, Orient, tilt, hour);         //Check gama
                 tetaZ = TetaZ (i,sigma,hour);
-                I = 50 * 1.8*10^-3;
+                I = parseInt(csvData[3+k][6])*0.0018;
                 Io = I_o (i, sigma, day, hour);
                 Id = I_d (I, Io);
                 Rb = CosDeg(teta)/CosDeg(tetaZ);
                 Ib = I - Id;
-                Itilt = Itilt (tilt, hour, Hour_Shine, Hour_Set, Ib, Rb, Id, I, rho_g);
-                I_Tilt = I_Tilt + Itilt/3.6;
+                I_inter = Itilt (tilt, hour, Hour_Shine, Hour_Set, Ib, Rb, Id, I, rho_g);
+                I_Tilt = I_Tilt + I_inter/3.6;
+                k++;
             }
-        }         
+        }
+    console.log(I_Tilt);
+    I_Tilt = 0;
+    k = 0;
     }
 });
