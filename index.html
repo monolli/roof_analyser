@@ -18,15 +18,18 @@ Tab == 4 spaces
 		<div id="left-section">
 			<div id="navigation-bar">
 				<button id="prev-address" type="button" class="btn btn-primary">Prev (a)</button>
-				<label id="address-label">No Address Selected</label>        
+				<div id="address-label">No Address Selected</div>        
 				<button id="next-address" type="button" class="btn btn-primary">Next (d)</button>
 			</div>
 			<div id="map"></div>
 		</div>
 		<div id="right-section">
-		  <input id="import" type="file" name="Import Data" accept=".csv"></input>
-		  <div id="addresses">Addresses:</div>
-			<textarea id="address_text_area" name="address" form="usrform">4213 Scandia Way Los Angeles CA</textarea>  
+			<div id="ghi">GHI:</div>
+			<input id="import" type="file" name="Import Data" accept=".csv"></input>
+			<div id="addressFile">Address File:</div>
+			<input id="importAddress" type="file" name="Import Data" accept=".csv"></input>
+			<div id="addresses">Addresses:</div>
+			<textarea id="address_text_area" name="address" form="usrform"></textarea>  
 			<br>
 			<button id="load-addresses" type="button" class="btn btn-primary">Load Addresses</button>
 			<div id="form">
