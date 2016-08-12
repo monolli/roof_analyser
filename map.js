@@ -551,7 +551,7 @@ document.getElementById("importAddress").addEventListener('change',function(){
 		reader.onerror = errorHandler;
 		
 		console.log(geoList);
-
+		
     } else {
     	alert('FileReader are not supported in this browser.');
     }
@@ -571,12 +571,52 @@ document.getElementById('load-addresses').addEventListener('click', function() {
 		}
 	}
 	document.getElementById('address_text_area').value = "";
-	if(geoIndex==0){
-		geocodeAddress(geocoder, map, geoIndex);
-		geoIndex = geoIndex + 1;
+	if(document.getElementById('address-label').innerHTML == "No Address Selected"){
+			geocodeAddress(geocoder, map, geoIndex);
 	}
 	console.log(geoList);
 }),
+
+document.getElementById('prev-address').addEventListener('click', function (){
+	if(geoIndex == 0){
+		alert('This is the first position.');
+	}else{
+		geoIndex =geoIndex - 1;
+		geocodeAddress(geocoder, map, geoIndex);
+	}
+});
+
+document.addEventListener('keyup', function(event) {
+  if (event.keyCode == 65) {
+    if(geoIndex == 0){
+		alert('This is the first position.');
+	}else{
+		geoIndex =geoIndex - 1;
+		geocodeAddress(geocoder, map, geoIndex);
+	}
+  }
+});
+
+document.addEventListener('keyup', function(event) {
+  if (event.keyCode == 68) {
+    if(geoIndex == geoList.length-1){
+		alert('This is the last position.');
+	}else{
+		geoIndex =geoIndex + 1;
+		geocodeAddress(geocoder, map, geoIndex);
+	}
+  }
+});
+
+
+document.getElementById('next-address').addEventListener('click', function (){
+	if(geoIndex == geoList.length-1){
+		alert('This is the last position.');
+	}else{
+		geoIndex =geoIndex + 1;
+		geocodeAddress(geocoder, map, geoIndex);
+	}
+});
 
 document.getElementById('generate-output').addEventListener('click', function() {
     
