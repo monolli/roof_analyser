@@ -106,7 +106,6 @@ function initDrawing(){
 			selections[geoIndex].push(coordinatesArray);
 		}
 		//window.alert(selections);
-		//polygon.setOptions({fillColor:'green'}); 
 		// change the fill colour
         calc_area();
 		//window.alert(coordinatesArray[1].lat());
