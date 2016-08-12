@@ -24,19 +24,22 @@ Tab == 4 spaces
 			<div id="map"></div>
 		</div>
 		<div id="right-section">
-		  <input id="import" type="file" name="Import Data" accept=".csv"></input>
-		  <div id="addresses">Addresses:</div>
+			<div id="ghi">GHI:</div>
+			<input id="import" type="file" name="Import Data" accept=".csv"></input>
+			<div id="addressFile">Address File:</div>
+			<input id="importAddress" type="file" name="Import Data" accept=".csv"></input>
+			<div id="addresses">Addresses:</div>
 			<textarea id="address_text_area" name="address" form="usrform">4213 Scandia Way Los Angeles CA</textarea>  
 			<br>
 			<button id="load-addresses" type="button" class="btn btn-primary">Load Addresses</button>
 			<div id="form">
-			<form>
-			<input type="checkbox" name="degree" value="0">0°
-			<input type="checkbox" name="degree" value="15">15°
-			<input type="checkbox" name="degree" value="30">30°
-			<input type="checkbox" name="degree" value="45">45°
-			<input type="checkbox" name="degree" value="60">60°
-			</form>
+				<form>
+				<input type="checkbox" name="degree" value="0">0°
+				<input type="checkbox" name="degree" value="15">15°
+				<input type="checkbox" name="degree" value="30">30°
+				<input type="checkbox" name="degree" value="45">45°
+				<input type="checkbox" name="degree" value="60">60°
+				</form>
 			</div>
 			<button id="generate-output" type="button" class="btn btn-primary">Generate Output</button>
 		</div>
