@@ -55,8 +55,7 @@ var geocoder = new google.maps.Geocoder();
 //Parameters:	the API geocoder and the map variable that is being used
 //Returns:	an alert if the status is != OK or the cropped map
 function geocodeAddress(geocoder,resultMap,index) {
-	var temp = geoList[index];
-    geocoder.geocode({'address': temp}, function(results, status) {
+    geocoder.geocode({'address': geoList[index]}, function(results, status) {
         if (status === google.maps.GeocoderStatus.OK) {
             //set the target coordinates and the zoom in the roof
             lat2 = results[0].geometry.location.lat();
@@ -64,7 +63,7 @@ function geocodeAddress(geocoder,resultMap,index) {
             
             resultMap.setCenter({lat: lat2, lng: lng2});
             resultMap.setZoom(20);
-            
+            document.getElementById('address-label').innerHTML = geoList[index];
         } else {
         	window.alert('Geocode was not successful for the following reason: ' + status);
         }
