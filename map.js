@@ -98,12 +98,20 @@ function initDrawing(){
   
 	google.maps.event.addListener(drawingManager, 'overlaycomplete', function(polygon) {
 		var coordinatesArray = polygon.overlay.getPath().getArray();
-		selections.push(coordinatesArray);
+		if(selections[geoIndex] == undefined && selections[geoIndex] == null){
+			var temp = [];
+			temp.push(coordinatesArray);
+			selections.push(temp);
+		}else{
+			selections[geoIndex].push(coordinatesArray);
+		}
 		//window.alert(selections);
-		polygon.setOptions({fillColor:'green'}); 
+		//polygon.setOptions({fillColor:'green'}); 
 		// change the fill colour
 		//window.alert(coordinatesArray[1].lat());
 		//window.alert(area)
+		console.log(selections);
+		//calc_area();
 	});
 }
 
@@ -115,9 +123,19 @@ function initDrawing(){
 //Returns:	nothing
 
 function calc_area(){
+
+	if(area[geoIndex] == undefined && area[geoIndex] == null){
+			var temp = [];
+			temp.push(google.maps.geometry.spherical.computeArea(selections[geoIndex][selections.length-1]));
+			area.push(temp);
+		}else{
+			area[geoIndex].push(google.maps.geometry.spherical.computeArea(selections[geoIndex][selections.length-1]));
+		}	
+	
 	//window.alert(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
-	area.push(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
+	//area[geoIndex].push(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
 	//window.alert(area);
+	console.log(area);
 }
 
 //-----------------------------------------------------------------------//
@@ -500,7 +518,7 @@ document.getElementById("import").addEventListener('change',function(){
         reader.onload = loadHandler;
 		reader.onerror = errorHandler;
 		
-		console.log(csvData);
+		//console.log(csvData);
 
     } else {
     	alert('FileReader are not supported in this browser.');
@@ -545,7 +563,7 @@ document.getElementById("importAddress").addEventListener('change',function(){
     	reader.onload = loadHandler;
 		reader.onerror = errorHandler;
 		
-		console.log(geoList);
+		//console.log(geoList);
 		
     } else {
     	alert('FileReader are not supported in this browser.');
@@ -573,7 +591,10 @@ document.getElementById('load-addresses').addEventListener('click', function() {
 }),
 
 document.getElementById('prev-address').addEventListener('click', function (){
-	if(geoIndex == 0){
+	if(geoList.length == 0){
+		alert('Load the addresses first.');
+	}
+	else if(geoIndex == 0){
 		alert('This is the first position.');
 	}else{
 		geoIndex =geoIndex - 1;
@@ -583,7 +604,10 @@ document.getElementById('prev-address').addEventListener('click', function (){
 
 document.addEventListener('keyup', function(event) {
   if (event.keyCode == 65) {
-    if(geoIndex == 0){
+    if(geoList.length == 0){
+		alert('Load the addresses first.');
+	}
+	else if(geoIndex == 0){
 		alert('This is the first position.');
 	}else{
 		geoIndex =geoIndex - 1;
@@ -594,7 +618,10 @@ document.addEventListener('keyup', function(event) {
 
 document.addEventListener('keyup', function(event) {
   if (event.keyCode == 68) {
-    if(geoIndex == geoList.length-1){
+    if(geoList.length == 0){
+		alert('Load the addresses first.');
+	}
+	else if(geoIndex == geoList.length-1){
 		alert('This is the last position.');
 	}else{
 		geoIndex =geoIndex + 1;
@@ -605,7 +632,10 @@ document.addEventListener('keyup', function(event) {
 
 
 document.getElementById('next-address').addEventListener('click', function (){
-	if(geoIndex == geoList.length-1){
+	if(geoList.length == 0){
+		alert('Load the addresses first.');
+	}
+	else if(geoIndex == geoList.length-1){
 		alert('This is the last position.');
 	}else{
 		geoIndex =geoIndex + 1;
