@@ -15,6 +15,9 @@ var area = [];
 var simAngle = [];
 var csvData = [];
 var colors = ['#00aedb', '#a200ff',	'#f47835', '#d41243', '#8ec127]'];
+var geoList = [];
+var geoIndex = 0;
+//to change the selection colors
 
 
 //Function: initMap()
@@ -51,9 +54,9 @@ var geocoder = new google.maps.Geocoder();
 //Purpose:	show the map location according to the given address
 //Parameters:	the API geocoder and the map variable that is being used
 //Returns:	an alert if the status is != OK or the cropped map
-function geocodeAddress(geocoder,resultMap) {
-	var address = document.getElementById('address_text_area').value;
-    geocoder.geocode({'address': address}, function(results, status) {
+function geocodeAddress(geocoder,resultMap,index) {
+	var temp = geoList[index];
+    geocoder.geocode({'address': temp}, function(results, status) {
         if (status === google.maps.GeocoderStatus.OK) {
             //set the target coordinates and the zoom in the roof
             lat2 = results[0].geometry.location.lat();
@@ -461,7 +464,7 @@ initMap();
 //run the function and initialyze the drawing tool/manager
 initDrawing();
 
-//button to import the csv containing addresses
+//button to import the csv containing GHI Data
 document.getElementById("import").addEventListener('change',function(){
 	
 	if (window.FileReader) {
@@ -512,9 +515,68 @@ document.getElementById("import").addEventListener('change',function(){
 	
 }),
 
+//button to import the csv containing address data
+//.CSV file must be a column with onde address per line
+document.getElementById("importAddress").addEventListener('change',function(){
+	
+	if (window.FileReader) {
+    	// FileReader is supported.
+    	var reader = new FileReader();
+        reader.readAsText(this.files[0]); //import the content as raw text
+        
+        function loadHandler(event) {
+			var csv = event.target.result;
+			processData(csv);
+		}
+     
+		function processData(csv) {
+			var allTextLines = csv.split(/\r\n|\n/);
+			//break the data in lines
+			for (var i=0; i<allTextLines.length; i++) {
+				if(allTextLines[i]!=''){//not empty
+					geoList.push(allTextLines[i]);
+				}
+			}
+		}
+			//console.log(geoList);
+			//window.alert(geoList);
+
+		function errorHandler(evt) {
+			if(evt.target.error.name == "NotReadableError") {
+				alert("Cannot read file!");
+			}
+		}
+		
+		// Handle errors load
+    	reader.onload = loadHandler;
+		reader.onerror = errorHandler;
+		
+		console.log(geoList);
+
+    } else {
+    	alert('FileReader are not supported in this browser.');
+    }
+	
+}),
+
 //create an action for the "Load Address" button
 document.getElementById('load-addresses').addEventListener('click', function() {
-	geocodeAddress(geocoder, map);
+	var address = document.getElementById('address_text_area').value;
+	if(address != ""){
+		var data = address.split(',');
+		//separate the address
+		for (var j=0; j<data.length; j++) {
+			if(data[j]!=''){//not empty
+				geoList.push(data[j]);
+			}
+		}
+	}
+	document.getElementById('address_text_area').value = "";
+	if(geoIndex==0){
+		geocodeAddress(geocoder, map, geoIndex);
+		geoIndex = geoIndex + 1;
+	}
+	console.log(geoList);
 }),
 
 document.getElementById('generate-output').addEventListener('click', function() {
