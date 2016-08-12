@@ -603,7 +603,7 @@ document.getElementById('prev-address').addEventListener('click', function (){
 });
 
 document.addEventListener('keyup', function(event) {
-  if (event.keyCode == 65) {
+  if (event.keyCode == 17) {
     if(geoList.length == 0){
 		alert('Load the addresses first.');
 	}
@@ -617,7 +617,7 @@ document.addEventListener('keyup', function(event) {
 });
 
 document.addEventListener('keyup', function(event) {
-  if (event.keyCode == 68) {
+  if (event.keyCode == 18) {
     if(geoList.length == 0){
 		alert('Load the addresses first.');
 	}

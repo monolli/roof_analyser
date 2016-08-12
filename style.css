@@ -32,7 +32,7 @@ html, body {
 	padding: 0 3%;
 	text-decoration: none;
 	display: block;
-	font-size: 1.1vw;
+	font-size: 0.8vw;
 	left:0;
 }
    
@@ -61,7 +61,7 @@ html, body {
 	padding: 0 3%;
 	text-decoration: none;
 	display: block;
-	font-size: 1.1vw;
+	font-size: 0.8vw;
 }
    
 #map {
