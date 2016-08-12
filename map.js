@@ -100,10 +100,11 @@ function initDrawing(){
 		var coordinatesArray = polygon.overlay.getPath().getArray();
 		selections.push(coordinatesArray);
 		//window.alert(selections);
-		polygon.setOptions({fillColor:'green'}); 
+		//polygon.setOptions({fillColor:'green'}); 
 		// change the fill colour
+        calc_area();
 		//window.alert(coordinatesArray[1].lat());
-		//window.alert(area)
+		window.alert(area);
 	});
 }
 
@@ -418,15 +419,16 @@ function I_data () {
     var lng = selections[0][0].lng();
     var I = [];
     var j = 0;
-    
-    while ( lat <= parseInt(csvData[1][1+j])+0.4 && lat >= parseInt(csvData[1][1+j])-0.4 &&
-            lng <= parseInt(csvData[1][2+j])+0.4 && lng >= parseInt(csvData[1][2+j])-0.4) {
+    while (csvData[0][1+j] != "end") {
+        if ( lat <= parseInt(csvData[0][1+j])+1 && lat >= parseInt(csvData[0][1+j])-1 &&
+            lng <= parseInt(csvData[1][1+j])+1 && lng >= parseInt(csvData[1][1+j])-1) {
             // THE LONGITUDE IS NEGATIVE 
-        for (var i = 0; i < 17520; i++) {
-            I[i] = parseInt(csvData[3+i][6+j]);
+            for (var i = 0; i < 17520; i++) {
+                I[i] = parseInt(csvData[3+i][1+j]);
+            }
+            break;
         }
-        break;
-    j = j + 2;
+    j = j + 1;
     }
     return I;
 }
@@ -638,6 +640,11 @@ document.getElementById('generate-output').addEventListener('click', function() 
     var t = 0;
     var d = I_data ();
     var I = 0;
+    var total_energy_0 = 0;
+    var total_energy_15 = 0;
+    var total_energy_30 = 0;
+    var total_energy_45 = 0;
+    var total_energy_60 = 0;
     
     for (var i = 0; i < selections.length; i++) {
         I_Tilt_1[i] = 0;
@@ -676,24 +683,31 @@ document.getElementById('generate-output').addEventListener('click', function() 
                     else if (t == 4) {
                         I_Tilt_5[i] = I_Tilt_5[i] + I_inter;
                     }
-                    else {
-                        x=1;
-                    }
                 }
             }
             k=0;
         }
     }
     
+var x = area[0];    
+
 console.log('Results: ');
 for (var n = 1; n-1 < selections.length; n++) {
-console.log('Polygon: ' + n);
-console.log('0 Degrees: '  + I_Tilt_1[n-1] + 'kWh');
-console.log('15 Degrees: ' + I_Tilt_2[n-1] + 'kWh');
-console.log('30 Degrees: ' + I_Tilt_3[n-1] + 'kWh');
-console.log('45 Degrees: ' + I_Tilt_4[n-1] + 'kWh');
-console.log('60 Degrees: ' + I_Tilt_5[n-1] + 'kWh');
-console.log('------------------------');
+    
+    total_energy_0 = I_Tilt_1[n-1]*(area[n-1]/CosDeg(0));
+    total_energy_15 = I_Tilt_1[n-1]*(area[n-1]/CosDeg(15));
+    total_energy_30 = I_Tilt_1[n-1]*(area[n-1]/CosDeg(30));
+    total_energy_45 = I_Tilt_1[n-1]*(area[n-1]/CosDeg(45));
+    total_energy_60 = I_Tilt_1[n-1]*(area[n-1]/CosDeg(60));
+    
+    console.log('Polygon: ' + n);
+    console.log('0 Degrees: '  + total_energy_0 + ' kWh');
+    console.log('15 Degrees: ' + total_energy_15 + ' kWh');
+    console.log('30 Degrees: ' + total_energy_30 + ' kWh');
+    console.log('45 Degrees: ' + total_energy_45 + ' kWh');
+    console.log('60 Degrees: ' + total_energy_60 + ' kWh');
+    console.log('------------------------');
+    
 }
     
 });
