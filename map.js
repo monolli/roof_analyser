@@ -11,8 +11,8 @@ Project Chai Energy
 //Global variables
 var map;
 var selections = [];
+var tilt = [0,15,30,45,60];
 var area = [];
-var simAngle = [];
 var csvData = [];
 var colors = ['#00aedb', '#a200ff',	'#f47835', '#d41243', '#8ec127]'];
 
@@ -98,7 +98,6 @@ function initDrawing(){
 		var coordinatesArray = polygon.overlay.getPath().getArray();
 		selections.push(coordinatesArray);
 		//window.alert(selections);
-		calc_area();
 		polygon.setOptions({fillColor:'green'}); 
 		// change the fill colour
 		//window.alert(coordinatesArray[1].lat());
@@ -417,18 +416,14 @@ function I_data () {
     var lng = selections[0][0].lng();
     var I = [];
     var j = 0;
-    var aux = parseInt(csvData[1][1+j])+0.4;
-    var aux2 = parseInt(csvData[1][1+j])-0.4;
-    var aux3= parseInt(csvData[1][2+j])+0.4;
-    var aux4 = parseInt(csvData[1][2+j])-0.4;
     
     while ( lat <= parseInt(csvData[1][1+j])+0.4 && lat >= parseInt(csvData[1][1+j])-0.4 &&
             lng <= parseInt(csvData[1][2+j])+0.4 && lng >= parseInt(csvData[1][2+j])-0.4) {
             // THE LONGITUDE IS NEGATIVE 
         for (var i = 0; i < 17520; i++) {
             I[i] = parseInt(csvData[3+i][6+j]);
-            break;
         }
+        break;
     j = j + 2;
     }
     return I;
@@ -517,19 +512,16 @@ document.getElementById('load-addresses').addEventListener('click', function() {
 	geocodeAddress(geocoder, map);
 }),
 
+    
 document.getElementById('generate-output').addEventListener('click', function() {
     
-    //console.log(selections[0][0].lat())
-    //console.log(selections[0][0].lng())
-    //console.log(selections[0][1].lat())
-    //console.log(selections[0][1].lng())
-    //console.log(selections[0][2].lat())
-    //console.log(selections[0][2].lng())
+    var I_Tilt_1 = [];
+    var I_Tilt_2 = [];
+    var I_Tilt_3 = [];
+    var I_Tilt_4 = [];
+    var I_Tilt_5 = [];
     
-    var tilt = 30;
-    var I_Tilt = 0;
     var rho_g = 0.25;       //Diffuse Reflectance Reference:http://www.simulatedvision.co.uk/V&A_Chap14.pdf
-    
     var sigma = 0;          
     var Hour_Shine = 0;
     var Hour_Set = 0;
@@ -543,30 +535,65 @@ document.getElementById('generate-output').addEventListener('click', function() 
     var Orient = 0;
     var I_inter = 0;
     var k = 0;
-    
-    var I = I_data ();
+    var t = 0;
+    var d = I_data ();
+    var I = 0;
     
     for (var i = 0; i < selections.length; i++) {
+        I_Tilt_1[i] = 0;
+        I_Tilt_2[i] = 0;
+        I_Tilt_3[i] = 0;
+        I_Tilt_4[i] = 0;
+        I_Tilt_5[i] = 0;
     	Orient = Orientation (i); // i = polygon number that you want to calculate;
-        for (var day = 1; day <= 365; day++) {
-            sigma = Sigma (day);
-            Hour_Shine = SunShine (i, sigma);
-            Hour_Set = SunSet (i, sigma);
-            for (var hour = 0; hour <= 23.5; hour = hour + 0.5){
-                teta = Teta (i, sigma, Orient, tilt, hour);         //Check gama
-                tetaZ = TetaZ (i,sigma,hour);
-                I = parseInt(csvData[3+k][6])*0.0018;
-                Io = I_o (i, sigma, day, hour);
-                Id = I_d (I, Io);
-                Rb = CosDeg(teta)/CosDeg(tetaZ);
-                Ib = I - Id;
-                I_inter = Itilt (tilt, hour, Hour_Shine, Hour_Set, Ib, Rb, Id, I, rho_g);
-                I_Tilt = I_Tilt + I_inter/3.6;
-                k++;
+        for (var t = 0; t < tilt.length; t++) {
+            for (var day = 1; day <= 365; day++) {
+                sigma = Sigma (day);
+                Hour_Shine = SunShine (i, sigma);
+                Hour_Set = SunSet (i, sigma);
+                for (var hour = 0; hour <= 23.5; hour = hour + 0.5){
+                    teta = Teta (i, sigma, Orient, tilt[t], hour);         //Check gama
+                    tetaZ = TetaZ (i,sigma,hour);
+                    I = d[k]*0.0018;
+                    k++;
+                    Io = I_o (i, sigma, day, hour);
+                    Id = I_d (I, Io);
+                    Rb = CosDeg(teta)/CosDeg(tetaZ);
+                    Ib = I - Id;
+                    I_inter = Itilt (tilt[t], hour, Hour_Shine, Hour_Set, Ib, Rb, Id, I, rho_g)/3.6;
+                    if (t == 0){
+                        I_Tilt_1[i] = I_Tilt_1[i] + I_inter;
+                    }
+                    else if (t == 1) {
+                        I_Tilt_2[i] = I_Tilt_2[i] + I_inter;
+                    }
+                    else if (t == 2) {
+                        I_Tilt_3[i] = I_Tilt_3[i] + I_inter;
+                    }
+                    else if (t == 3) {
+                        I_Tilt_4[i] = I_Tilt_4[i] + I_inter;
+                    }
+                    else if (t == 4) {
+                        I_Tilt_5[i] = I_Tilt_5[i] + I_inter;
+                    }
+                    else {
+                        x=1;
+                    }
+                }
             }
+            k=0;
         }
-    console.log(I_Tilt);
-    I_Tilt = 0;
-    k = 0;
     }
+    
+console.log('Results: ');
+for (var n = 1; n-1 < selections.length; n++) {
+console.log('Polygon: ' + n);
+console.log('0 Degrees: '  + I_Tilt_1[n-1] + 'kWh');
+console.log('15 Degrees: ' + I_Tilt_2[n-1] + 'kWh');
+console.log('30 Degrees: ' + I_Tilt_3[n-1] + 'kWh');
+console.log('45 Degrees: ' + I_Tilt_4[n-1] + 'kWh');
+console.log('60 Degrees: ' + I_Tilt_5[n-1] + 'kWh');
+console.log('------------------------');
+}
+    
 });
