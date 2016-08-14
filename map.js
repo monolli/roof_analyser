@@ -9,15 +9,15 @@ Project Chai Energy
 
 
 //Global variables
+var area = [];
+var colors = ['#00aedb', '#a200ff',	'#f47835', '#d41243', '#8ec127]'];
+//to change the selection colors
+var csvData = [];
+var geoIndex = 0;
+var geoList = [];
 var map;
 var selections = [];
 var tilt = [0,15,30,45,60];
-var area = [];
-var csvData = [];
-var colors = ['#00aedb', '#a200ff',	'#f47835', '#d41243', '#8ec127]'];
-var geoList = [];
-var geoIndex = 0;
-//to change the selection colors
 
 
 //Function: initMap()
@@ -109,7 +109,7 @@ function initDrawing(){
 		// change the fill colour
         calc_area();
 		//window.alert(coordinatesArray[1].lat());
-		window.alert(area);
+		//window.alert(area);
 
 	});
 }
@@ -125,16 +125,22 @@ function calc_area(){
 
 	if(area[geoIndex] == undefined && area[geoIndex] == null){
 			var temp = [];
-			temp.push(google.maps.geometry.spherical.computeArea(selections[geoIndex][selections.length-1]));
+			temp.push(google.maps.geometry.spherical.computeArea(selections[geoIndex][selections[geoIndex].length-1]));
 			area.push(temp);
 		}else{
-			area[geoIndex].push(google.maps.geometry.spherical.computeArea(selections[geoIndex][selections.length-1]));
+			area[geoIndex].push(google.maps.geometry.spherical.computeArea(selections[geoIndex][selections[geoIndex].length-1]));
 		}	
+    
 	
 	//window.alert(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
 	//area[geoIndex].push(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
 	//window.alert(area);
 	console.log(area);
+    console.log(selections[0][0].length);
+    console.log(geoList.length);
+    console.log(tilt.length);
+    console.log(selections[geoIndex].length-1);
+    console.log(selections.length-1);
 }
 
 //-----------------------------------------------------------------------//
@@ -211,25 +217,27 @@ function SinDeg(Angle) {
 //Purpose:	  Calculate the roof orientation in degrees (Azimuth Angle)
 //Parameters: Polygon that you want to calculate
 //Returns:    The roof orientation in degrees 
-function Orientation (numPoly) {
+function Orientation (numGeo,numPoly) {
     
-    var deltaLat = selections[numPoly][0].lat() - selections[numPoly][1].lat();   
+    var numPoints = selections[numGeo][numPoly].length;
+    
+    var deltaLat = selections[numGeo][numPoly][0].lat() - selections[numGeo][numPoly][1].lat();   
     // Difference between the latitude of two points at the same height.
-    var deltaLng = selections[numPoly][0].lng() - selections[numPoly][1].lng();      
+    var deltaLng = selections[numGeo][numPoly][0].lng() - selections[numGeo][numPoly][1].lng();      
     // Difference between the longitude of two points at the same height.
     
     // To get the point that represents the opositive side of the roof orientation.
-    if (selections[numPoly].length === 3 || selections[numPoly].length === 4) {
-        var midLat = selections[numPoly][2].lat();
-        var midLng = selections[numPoly][2].lng(); 
+    if (numPoints === 3 || numPoints === 4) {
+        var midLat = selections[numGeo][numPoly][2].lat();
+        var midLng = selections[numGeo][numPoly][2].lng(); 
     }
-    else if (selections[numPoly].length % 2 === 1) {    // lenght is odd
-        var midLat = selections[numPoly][Lat.length/2 + 0.5].lat();
-        var midLng = selections[numPoly][Lng.length/2 + 0.5].lng(); 
+    else if (numPoints % 2 === 1) {    // lenght is odd
+        var midLat = selections[numGeo][numPoly][numPoints/2 + 0.5].lat();
+        var midLng = selections[numGeo][numPoly][numPoints/2 + 0.5].lng(); 
     }
     else {                              // lenght is even
-        var midLat = selections[numPoly][Lat.length/2].lat();
-        var midLng = selections[numPoly][Lng.length/2].lng(); 
+        var midLat = selections[numGeo][numPoly][numPoints/2].lat();
+        var midLng = selections[numGeo][numPoly][numPoints/2].lng(); 
     }
     
     // A auxiliar line will be created to make the calculations more simple  (y = slope*x + inter)
@@ -241,7 +249,7 @@ function Orientation (numPoly) {
     else {
         var slope = deltaLat/deltaLng;          
         // line slope (a = deltaLat/deltaLng)
-        var inter = selections[numPoly][0].lat() - slope*selections[numPoly][0].lng();      
+        var inter = selections[numGeo][numPoly][0].lat() - slope*selections[numGeo][numPoly][0].lng();      
         // line interssection  (inter = y - slope*x) 
         var slopeAngle = ArcTanDeg(slope);       
         // Perperdicular angle of the roof orientation
@@ -275,11 +283,11 @@ function Orientation (numPoly) {
     
     else if (slopeAngle === 0){
         
-        if (midLat > selections[numPoly][0].lat()) {      
+        if (midLat > selections[numGeo][numPoly][0].lat()) {      
             // South Orientation -> Azimuth Angle = 0 degrees
             var orient = 0;
         }
-        else if (midLat < selections[numPoly][0].lat()) {
+        else if (midLat < selections[numGeo][numPoly][0].lat()) {
             // North Orientation -> Azimuth Angle = 180 degrees
             var orient = 180;
         }        
@@ -287,11 +295,11 @@ function Orientation (numPoly) {
     
     else if (slopeAngle === 0){
         
-        if (midLng > selections[numPoly][0].lng()) {      
+        if (midLng > selections[numGeo][numPoly][0].lng()) {      
             // West Orientation -> Azimuth Angle = 90 degrees
             var orient = 90;
         }
-        else if (midLng < selections[numPoly][0].lng()) { 
+        else if (midLng < selections[numGeo][numPoly][0].lng()) { 
             // East Orientation -> Azimuth Angle = -90 degrees
             var orient = -90;
         }        
@@ -322,8 +330,8 @@ function Sigma (day) {
 //Purpose: Calculate the sunset hour.
 //Parameters: Polygon that you want to calculate (NumPoly) and the sun declination
 //Returns: Sunset hour [h]
-function SunShine (numPoly, sigma) {
-    var wShine = -ArcCosDeg(-TanDeg(selections[numPoly][0].lat())*TanDeg(sigma));
+function SunShine (numGeo,numPoly, sigma) {
+    var wShine = -ArcCosDeg(-TanDeg(selections[numGeo][numPoly][0].lat())*TanDeg(sigma));
     // Sunshine hour angle [degrees]
     var hourShine = 12 + wShine/15;                             
     // Sunshine hour [hour]
@@ -336,8 +344,8 @@ function SunShine (numPoly, sigma) {
 //Purpose: Calculate the sunset hour.
 //Parameters: Polygon that you want to calculate (NumPoly) and the sun declination (sigma)
 //Returns: Sunset hour [h]
-function SunSet (numPoly, sigma){
-    var wSet = ArcCosDeg(-TanDeg(selections[numPoly][0].lat())*TanDeg(sigma));      
+function SunSet (numGeo,numPoly, sigma){
+    var wSet = ArcCosDeg(-TanDeg(selections[numGeo][numPoly][0].lat())*TanDeg(sigma));      
     // Sunset hour angle [degrees]  
     var hourSet = 12 + wSet/15;                                   
     // Sunset hour [hour]   WARNING: THE VALUE OF wSET is NEGATIVE
@@ -351,11 +359,11 @@ function SunSet (numPoly, sigma){
 //Parameters: Polygon that you want to calculate (NumPoly) and the sun declination (sigma),
 //and the current time (hour)
 //Returns: Solar radiance angle [degrees]
-function TetaZ (numPoly,sigma,hour){
+function TetaZ (numGeo,numPoly,sigma,hour){
     
     var w1 = (hour-12)*15;
-    var tetaZ = ArcCosDeg(CosDeg(selections[numPoly][0].lat())*CosDeg(sigma)*CosDeg(w1)
-                +SinDeg(selections[numPoly][0].lat())*SinDeg(sigma));
+    var tetaZ = ArcCosDeg(CosDeg(selections[numGeo][numPoly][0].lat())*CosDeg(sigma)*CosDeg(w1)
+                +SinDeg(selections[numGeo][numPoly][0].lat())*SinDeg(sigma));
     return tetaZ;
 }
 
@@ -366,16 +374,16 @@ function TetaZ (numPoly,sigma,hour){
 //Parameters: Polygon that you want to calculate (NumPoly) and the sun declination (sigma),
 //the roof orientation (gama), roof tilt value, and the current time (hour).
 //Returns: Irradiance roof angle [degrees]
-function Teta (numPoly, sigma, gama, tilt, hour) {
+function Teta (numGeo, numPoly, numTilt, sigma, gama, hour) {
 
     var w1 = (hour-12)*15;     
     var w2 = w1 + 7.5;
 
-    var teta = ArcCosDeg(SinDeg(sigma)*SinDeg(selections[numPoly][0].lat())*CosDeg(tilt)
-                -SinDeg(sigma)*CosDeg(selections[numPoly][0].lat())*SinDeg(tilt)*CosDeg(gama)
-                +CosDeg(sigma)*CosDeg(selections[numPoly][0].lat())*CosDeg(tilt)*CosDeg(w1)
-                +CosDeg(sigma)*SinDeg(selections[numPoly][0].lat())*SinDeg(tilt)*CosDeg(gama)*CosDeg(w1)
-                +CosDeg(sigma)*SinDeg(tilt)*SinDeg(gama)*SinDeg(w1));
+    var teta = ArcCosDeg(SinDeg(sigma)*SinDeg(selections[numGeo][numPoly][0].lat())*CosDeg(tilt[numTilt])
+                -SinDeg(sigma)*CosDeg(selections[numGeo][numPoly][0].lat())*SinDeg(tilt[numTilt])*CosDeg(gama)
+                +CosDeg(sigma)*CosDeg(selections[numGeo][numPoly][0].lat())*CosDeg(tilt[numTilt])*CosDeg(w1)
+                +CosDeg(sigma)*SinDeg(selections[numGeo][numPoly][0].lat())*SinDeg(tilt[numTilt])*CosDeg(gama)*CosDeg(w1)
+                +CosDeg(sigma)*SinDeg(tilt[numTilt])*SinDeg(gama)*SinDeg(w1));
     return teta;
 }
 
@@ -387,7 +395,7 @@ function Teta (numPoly, sigma, gama, tilt, hour) {
 //Parameters: Polygon that you want to calculate (NumPoly) and the sun declination (sigma),
 //and the current day and time (hour).
 //Returns:	Extraterrestrial radiation on a horizontal surface [MJ/m2]
-function I_o (numPoly, sigma, day, hour){
+function I_o (numGeo,numPoly, sigma, day, hour){
     
     var w1 = (hour-12)*15;     
     var w2 = w1 + 7.5;
@@ -395,8 +403,8 @@ function I_o (numPoly, sigma, day, hour){
     var Gsc = 1367;     //Solar constant [W/m^2]
     
     var io = ((12*3600/Math.PI)*Gsc*(1+0.033*CosDeg(360*day/365))
-            *(CosDeg(selections[numPoly][0].lat())*CosDeg(sigma)*(SinDeg(w2)-SinDeg(w1))
-            +(Math.PI*(w2-w1)/180)*SinDeg(selections[numPoly][0].lat())*SinDeg(sigma)))/1000000;
+            *(CosDeg(selections[numGeo][numPoly][0].lat())*CosDeg(sigma)*(SinDeg(w2)-SinDeg(w1))
+            +(Math.PI*(w2-w1)/180)*SinDeg(selections[numGeo][numPoly][0].lat())*SinDeg(sigma)))/1000000;
     return io;
     // Io = Extraterrestrial radiation on a horizontal surface [MJ/m2] 
 }
@@ -431,21 +439,32 @@ function I_d (I, Io){
 }
 
 function I_data () {
-    var lat = selections[0][0].lat();
-    var lng = selections[0][0].lng();
-    var I = [];
-    var j = 0;
-    while (csvData[0][1+j] != "end") {
-        if ( lat <= parseInt(csvData[0][1+j])+1 && lat >= parseInt(csvData[0][1+j])-1 &&
-            lng <= parseInt(csvData[1][1+j])+1 && lng >= parseInt(csvData[1][1+j])-1) {
-            // THE LONGITUDE IS NEGATIVE 
-            for (var i = 0; i < 17520; i++) {
-                I[i] = parseInt(csvData[3+i][1+j]);
+    
+    var I = [];       // GHI [w/m²]
+    var temp = [];
+    var i = 0;          // Excel line
+    var j = 0;          // Excel Column
+    var lat = 0;
+    var lng = 0;
+    
+    for (var g = 0; g < geoList.length; g++) {
+        while (csvData[0][1+j] != "end") {
+            if (selections[g][0][0].lat() <= parseInt(csvData[0][1+j])+1            //Superior Latitude Limit
+                && selections[g][0][0].lat() >= parseInt(csvData[0][1+j])-1         //Inferior Superior Limit  
+                  && selections[g][0][0].lng() <= parseInt(csvData[1][1+j])+1       //Inferior Superior Limit
+                    && selections[g][0][0].lng() >= parseInt(csvData[1][1+j])-1) {  //Superior Superior Limit
+                                                                                    // THE LONGITUDE IS NEGATIVE
+                for (i = 0; i < 17520; i++) {
+                    temp[i] = parseInt(csvData[3+i][1+j]);
+                }
+                I.push(temp);
+                break;   
             }
-            break;
+        j = j + 1;
         }
-    j = j + 1;
+    j = 0;
     }
+    
     return I;
 }
 //Function: Itilt (tilt, hour, sunshine, sunset, Ib, Rb, Id, I, rho_g)
@@ -454,15 +473,15 @@ function I_data () {
 //, beam radiation, ratio between horizontal and tilt roofs, diffused irradiation, GHI (wheather data), and 
 // diffused ground reflectance.
 //Returns:	Total irradiation on a tilted plane (time interval) 
-function Itilt (tilt, hour, sunshine, sunset, Ib, Rb, Id, I, rho_g){
+function Itilt (numTilt, hour, sunshine, sunset, Ib, Rb, Id, I, rho_g){
     
-    if (tilt < 0 || tilt > 90 || hour < sunshine || hour > sunset){
+    if (tilt[numTilt] < 0 || tilt[numTilt] > 90 || hour < sunshine || hour > sunset){
         var I_Tilt = 0;         
     }
     else {
         var I_Tilt = Ib*Rb
-                        +Id*((1+CosDeg(tilt))/2)
-                        +I*rho_g*((1-CosDeg(tilt))/2);
+                      +Id*((1+CosDeg(tilt[numTilt]))/2)
+                      +I*rho_g*((1-CosDeg(tilt[numTilt]))/2);
     }
     return I_Tilt;
     //Total irradiation on a tilted plane (time interval)    
@@ -630,7 +649,6 @@ document.addEventListener('keyup', function(event) {
   }
 });
 
-
 document.getElementById('next-address').addEventListener('click', function (){
 	if(geoList.length == 0){
 		alert('Load the addresses first.');
@@ -645,13 +663,7 @@ document.getElementById('next-address').addEventListener('click', function (){
 
 document.getElementById('generate-output').addEventListener('click', function() {
     
-    var I_Tilt_1 = [];
-    var I_Tilt_2 = [];
-    var I_Tilt_3 = [];
-    var I_Tilt_4 = [];
-    var I_Tilt_5 = [];
-    
-    var rho_g = 0.25;       //Diffuse Reflectance Reference:http://www.simulatedvision.co.uk/V&A_Chap14.pdf
+    var Orient = 0;
     var sigma = 0;          
     var Hour_Shine = 0;
     var Hour_Set = 0;
@@ -661,81 +673,96 @@ document.getElementById('generate-output').addEventListener('click', function() 
     var Id = 0;
     var Rb = 0;
     var Ib = 0;
-    var I_Tilt = 0;
-    var Orient = 0;
+    var rho_g = 0.25;       //Diffuse Reflectance Reference:http://www.simulatedvision.co.uk/V&A_Chap14.pdf
     var I_inter = 0;
-    var k = 0;
-    var t = 0;
-    var d = I_data ();
     var I = 0;
-    var total_energy_0 = 0;
-    var total_energy_15 = 0;
-    var total_energy_30 = 0;
-    var total_energy_45 = 0;
-    var total_energy_60 = 0;
+    var sumEnergy = 0;
     
-    for (var i = 0; i < selections.length; i++) {
-        I_Tilt_1[i] = 0;
-        I_Tilt_2[i] = 0;
-        I_Tilt_3[i] = 0;
-        I_Tilt_4[i] = 0;
-        I_Tilt_5[i] = 0;
-    	Orient = Orientation (i); // i = polygon number that you want to calculate;
-        for (var t = 0; t < tilt.length; t++) {
-            for (var day = 1; day <= 365; day++) {
-                sigma = Sigma (day);
-                Hour_Shine = SunShine (i, sigma);
-                Hour_Set = SunSet (i, sigma);
-                for (var hour = 0; hour <= 23.5; hour = hour + 0.5){
-                    teta = Teta (i, sigma, Orient, tilt[t], hour);         //Check gama
-                    tetaZ = TetaZ (i,sigma,hour);
-                    I = d[k]*0.0018;
-                    k++;
-                    Io = I_o (i, sigma, day, hour);
-                    Id = I_d (I, Io);
-                    Rb = CosDeg(teta)/CosDeg(tetaZ);
-                    Ib = I - Id;
-                    I_inter = Itilt (tilt[t], hour, Hour_Shine, Hour_Set, Ib, Rb, Id, I, rho_g)/3.6;
-                    if (t == 0){
-                        I_Tilt_1[i] = I_Tilt_1[i] + I_inter;
-                    }
-                    else if (t == 1) {
-                        I_Tilt_2[i] = I_Tilt_2[i] + I_inter;
-                    }
-                    else if (t == 2) {
-                        I_Tilt_3[i] = I_Tilt_3[i] + I_inter;
-                    }
-                    else if (t == 3) {
-                        I_Tilt_4[i] = I_Tilt_4[i] + I_inter;
-                    }
-                    else if (t == 4) {
-                        I_Tilt_5[i] = I_Tilt_5[i] + I_inter;
+    var Idata = [[]];
+    
+    var I_Tilt = 0;
+    var E_Tilt = 0;
+    var I_Surface = [];
+    var E_Surface = [];
+    var I_Geo = [];
+    var E_Geo = [];
+    
+    var I_temp1 = [];
+    var E_temp1 = [];
+    var I_temp2 = [];
+    var E_temp2 = [];
+    var I_temp3 = [];
+    var E_temp3 = [];
+    var I1 = 0;
+    var E1 = 0;
+    var I2 = [];
+    var E2 = [];
+    var I3 = [];
+    var E3 = [];
+
+    Idata = I_data();
+    
+    for (var g = 0; g < geoList.length; g++ ) {
+        for (var s = 0; s < selections[g].length; s++) {
+            Orient = Orientation (g, s); // i = polygon number that you want to calculate;
+            for (var t = 0; t < tilt.length; t++) {
+                for (var day = 1; day <= 365; day++) {
+                    sigma = Sigma (day);
+                    Hour_Shine = SunShine (g, s, sigma);
+                    Hour_Set = SunSet (g, s, sigma);
+                    for (var hour = 0; hour <= 23.5; hour = hour + 0.5){
+                        teta = Teta (g, s, t, sigma, Orient, hour);         //Check gama
+                        tetaZ = TetaZ (g, s, sigma, hour);
+                        I = Idata[g][(hour/0.5)+(day-1)*(24/0.5)] * 0.0018;
+                        Io = I_o (g, s, sigma, day, hour);
+                        Id = I_d (I, Io);
+                        Rb = CosDeg(teta)/CosDeg(tetaZ);
+                        Ib = I - Id;
+                        I_inter = Itilt (t, hour, Hour_Shine, Hour_Set, Ib, Rb, Id, I, rho_g)/3.6;
+                        I_Tilt = I_Tilt + I_inter;
+                        E_Tilt = E_Tilt + (I_inter/CosDeg(tilt[t]));
                     }
                 }
+            I_temp1[t] = I_Tilt;
+            E_temp1[t] = E_Tilt;
+            I_Tilt = 0;     //  Restart for the next angle
+            E_Tilt = 0;     //  Restart for the next angle
             }
-            k=0;
+        I_Surface.push (I_temp1);
+        E_Surface.push (E_temp1);
+        I_temp2[s] = I_Surface[s];
+        E_temp2[s] = E_Surface[s];
         }
+    I_Geo.push (I_temp2);
+    E_Geo.push (E_temp2);
+    I_Surface = [];
+    E_Surface = [];
+    I_temp2 = [];    
+    E_temp2 = [];
     }
     
-var x = area[0];    
+    /*
+    for (g = 0; g < geoList.length; g++ ) {
+        for (t = 0; t < tilt.length; t++) {
+            for (s = 0; s < selections[g].length; s++){
+            SumEnergy[g][t] = sumEnergy + Energy[g][s][t]; 
+            }
+        }
+    }
 
-console.log('Results: ');
-for (var n = 1; n-1 < selections.length; n++) {
-    
-    total_energy_0 = I_Tilt_1[n-1]*(area[n-1]/CosDeg(0));
-    total_energy_15 = I_Tilt_1[n-1]*(area[n-1]/CosDeg(15));
-    total_energy_30 = I_Tilt_1[n-1]*(area[n-1]/CosDeg(30));
-    total_energy_45 = I_Tilt_1[n-1]*(area[n-1]/CosDeg(45));
-    total_energy_60 = I_Tilt_1[n-1]*(area[n-1]/CosDeg(60));
-    
-    console.log('Polygon: ' + n);
-    console.log('0 Degrees: '  + total_energy_0 + ' kWh');
-    console.log('15 Degrees: ' + total_energy_15 + ' kWh');
-    console.log('30 Degrees: ' + total_energy_30 + ' kWh');
-    console.log('45 Degrees: ' + total_energy_45 + ' kWh');
-    console.log('60 Degrees: ' + total_energy_60 + ' kWh');
-    console.log('------------------------');
-    
-}
+    console.log('Results: ');
+    for (g = 1; g-1 < geoList.length; n++) {
+        console.log('Building1: ' + g);
+            for (t = 0; t < tilt.length; t++) {
+            console.log('Total Energy - ' + tilt[t] + ' Degrees: '  + SumEnergy[g][t] + ' kWh');
+                for (s = 0; s < selections[g].length; s++){
+                    console.log('   Face' + s + ': ' + SumEnergy[g][t]);    
+                }
+            }
+        console.log(' ');
+        console.log('------------------------');
+        console.log(' ');
+    }   
+    */
     
 });
