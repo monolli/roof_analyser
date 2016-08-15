@@ -135,12 +135,12 @@ function calc_area(){
 	//window.alert(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
 	//area[geoIndex].push(google.maps.geometry.spherical.computeArea(selections[selections.length-1]));
 	//window.alert(area);
-	console.log(area);
-    console.log(selections[0][0].length);
-    console.log(geoList.length);
-    console.log(tilt.length);
-    console.log(selections[geoIndex].length-1);
-    console.log(selections.length-1);
+	//console.log(area);
+    //console.log(selections[0][0].length);
+    //console.log(geoList.length);
+    //console.log(tilt.length);
+    //console.log(selections[geoIndex].length-1);
+    //console.log(selections.length-1);
 }
 
 //-----------------------------------------------------------------------//
@@ -691,14 +691,6 @@ document.getElementById('generate-output').addEventListener('click', function() 
     var E_temp1 = [];
     var I_temp2 = [];
     var E_temp2 = [];
-    var I_temp3 = [];
-    var E_temp3 = [];
-    var I1 = 0;
-    var E1 = 0;
-    var I2 = [];
-    var E2 = [];
-    var I3 = [];
-    var E3 = [];
 
     Idata = I_data();
     
@@ -720,7 +712,7 @@ document.getElementById('generate-output').addEventListener('click', function() 
                         Ib = I - Id;
                         I_inter = Itilt (t, hour, Hour_Shine, Hour_Set, Ib, Rb, Id, I, rho_g)/3.6;
                         I_Tilt = I_Tilt + I_inter;
-                        E_Tilt = E_Tilt + (I_inter/CosDeg(tilt[t]));
+                        E_Tilt = E_Tilt + (I_inter/CosDeg(tilt[t]))*area[g][s];
                     }
                 }
             I_temp1[t] = I_Tilt;
@@ -732,6 +724,8 @@ document.getElementById('generate-output').addEventListener('click', function() 
         E_Surface.push (E_temp1);
         I_temp2[s] = I_Surface[s];
         E_temp2[s] = E_Surface[s];
+        I_temp1 = [];
+        E_temp1 = [];
         }
     I_Geo.push (I_temp2);
     E_Geo.push (E_temp2);
@@ -740,29 +734,21 @@ document.getElementById('generate-output').addEventListener('click', function() 
     I_temp2 = [];    
     E_temp2 = [];
     }
+        
+    var numFace = 0;
     
-    /*
-    for (g = 0; g < geoList.length; g++ ) {
-        for (t = 0; t < tilt.length; t++) {
-            for (s = 0; s < selections[g].length; s++){
-            SumEnergy[g][t] = sumEnergy + Energy[g][s][t]; 
-            }
-        }
-    }
-
     console.log('Results: ');
-    for (g = 1; g-1 < geoList.length; n++) {
-        console.log('Building1: ' + g);
-            for (t = 0; t < tilt.length; t++) {
-            console.log('Total Energy - ' + tilt[t] + ' Degrees: '  + SumEnergy[g][t] + ' kWh');
-                for (s = 0; s < selections[g].length; s++){
-                    console.log('   Face' + s + ': ' + SumEnergy[g][t]);    
+    for (g = 0; g < geoList.length; g++) {
+        console.log('Address: ' + geoList[g]);
+            for (s = 0; s < selections[g].length; s++){
+                numFace = s + 1;
+                console.log('   Roof face ' + numFace + ": ");
+                for (t = 0; t < tilt.length; t++) {
+                    //console.log('       ' + tilt[t] + ' Degrees: '  +I_Geo[g][s][t].toFixed(2) + ' kW/m²');
+                    console.log('       ' + tilt[t] + ' Degrees: '  +E_Geo[g][s][t].toFixed(2) + ' kWh');
                 }
             }
-        console.log(' ');
         console.log('------------------------');
-        console.log(' ');
     }   
-    */
     
 });
