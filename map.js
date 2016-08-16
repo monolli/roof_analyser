@@ -18,6 +18,7 @@ var geoList = [];
 var map;
 var selections = [];
 var tilt = [0,15,30,45,60];
+var outputString;
 
 
 //Function: initMap()
@@ -738,6 +739,17 @@ document.getElementById('generate-output').addEventListener('click', function() 
     	} 				
     }
         
+    var outputJSON = {};
+    
+    outputJSON["address"] = geoList;
+    outputJSON["selections"] =  selections;
+    
+    outputString = JSON.stringify(outputJSON);
+    
+   // console.log(outputJSON);
+    //console.log(outputString);
+    
+    
     var numFace = 0;
     
     console.log('Results: ');
