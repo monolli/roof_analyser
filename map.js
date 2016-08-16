@@ -449,7 +449,8 @@ function I_data () {
     
     for (var g = 0; g < geoList.length; g++) {
         while (csvData[0][1+j] != "end") {
-            if (selections[g][0][0].lat() <= parseInt(csvData[0][1+j])+1            //Superior Latitude Limit
+            if (selections[g]!= undefined && 				//Have at least one selection
+            	selections[g][0][0].lat() <= parseInt(csvData[0][1+j])+1            //Superior Latitude Limit
                 && selections[g][0][0].lat() >= parseInt(csvData[0][1+j])-1         //Inferior Superior Limit  
                   && selections[g][0][0].lng() <= parseInt(csvData[1][1+j])+1       //Inferior Superior Limit
                     && selections[g][0][0].lng() >= parseInt(csvData[1][1+j])-1) {  //Superior Superior Limit
@@ -695,60 +696,62 @@ document.getElementById('generate-output').addEventListener('click', function() 
     Idata = I_data();
     
     for (var g = 0; g < geoList.length; g++ ) {
-        for (var s = 0; s < selections[g].length; s++) {
-            Orient = Orientation (g, s); // i = polygon number that you want to calculate;
-            for (var t = 0; t < tilt.length; t++) {
-                for (var day = 1; day <= 365; day++) {
-                    sigma = Sigma (day);
-                    Hour_Shine = SunShine (g, s, sigma);
-                    Hour_Set = SunSet (g, s, sigma);
-                    for (var hour = 0; hour <= 23.5; hour = hour + 0.5){
-                        teta = Teta (g, s, t, sigma, Orient, hour);         //Check gama
-                        tetaZ = TetaZ (g, s, sigma, hour);
-                        I = Idata[g][(hour/0.5)+(day-1)*(24/0.5)] * 0.0018;
-                        Io = I_o (g, s, sigma, day, hour);
-                        Id = I_d (I, Io);
-                        Rb = CosDeg(teta)/CosDeg(tetaZ);
-                        Ib = I - Id;
-                        I_inter = Itilt (t, hour, Hour_Shine, Hour_Set, Ib, Rb, Id, I, rho_g)/3.6;
-                        I_Tilt = I_Tilt + I_inter;
-                        E_Tilt = E_Tilt + (I_inter/CosDeg(tilt[t]))*area[g][s];
-                    }
-                }
-            I_temp1[t] = I_Tilt;
-            E_temp1[t] = E_Tilt;
-            I_Tilt = 0;     //  Restart for the next angle
-            E_Tilt = 0;     //  Restart for the next angle
-            }
-        I_Surface.push (I_temp1);
-        E_Surface.push (E_temp1);
-        I_temp2[s] = I_Surface[s];
-        E_temp2[s] = E_Surface[s];
-        I_temp1 = [];
-        E_temp1 = [];
-        }
-    I_Geo.push (I_temp2);
-    E_Geo.push (E_temp2);
-    I_Surface = [];
-    E_Surface = [];
-    I_temp2 = [];    
-    E_temp2 = [];
+    	if( selections[g] != undefined ){		//Have at least one selection
+			for (var s = 0; s < selections[g].length; s++) {
+		        Orient = Orientation (g, s); // i = polygon number that you want to calculate;
+		        for (var t = 0; t < tilt.length; t++) {
+		            for (var day = 1; day <= 365; day++) {
+		                sigma = Sigma (day);
+		                Hour_Shine = SunShine (g, s, sigma);
+		                Hour_Set = SunSet (g, s, sigma);
+		                for (var hour = 0; hour <= 23.5; hour = hour + 0.5){
+		                    teta = Teta (g, s, t, sigma, Orient, hour);         //Check gama
+		                    tetaZ = TetaZ (g, s, sigma, hour);
+		                    I = Idata[g][(hour/0.5)+(day-1)*(24/0.5)] * 0.0018;
+		                    Io = I_o (g, s, sigma, day, hour);
+		                    Id = I_d (I, Io);
+		                    Rb = CosDeg(teta)/CosDeg(tetaZ);
+		                    Ib = I - Id;
+		                    I_inter = Itilt (t, hour, Hour_Shine, Hour_Set, Ib, Rb, Id, I, rho_g)/3.6;
+		                    I_Tilt = I_Tilt + I_inter;
+		                    E_Tilt = E_Tilt + (I_inter/CosDeg(tilt[t]))*area[g][s];
+		                }
+		            }
+				    I_temp1[t] = I_Tilt;
+				    E_temp1[t] = E_Tilt;
+				    I_Tilt = 0;     //  Restart for the next angle
+				    E_Tilt = 0;     //  Restart for the next angle
+		        }
+				I_Surface.push (I_temp1);
+				E_Surface.push (E_temp1);
+				I_temp2[s] = I_Surface[s];
+				E_temp2[s] = E_Surface[s];
+				I_temp1 = [];
+				E_temp1 = [];
+		    }
+			I_Geo.push (I_temp2);
+			E_Geo.push (E_temp2);
+			I_Surface = [];
+			E_Surface = [];
+			I_temp2 = [];    
+			E_temp2 = [];
+    	} 				
     }
         
     var numFace = 0;
     
     console.log('Results: ');
     for (g = 0; g < geoList.length; g++) {
-        console.log('Address: ' + geoList[g]);
-            for (s = 0; s < selections[g].length; s++){
-                numFace = s + 1;
-                console.log('   Roof face ' + numFace + ": ");
-                for (t = 0; t < tilt.length; t++) {
-                    //console.log('       ' + tilt[t] + ' Degrees: '  +I_Geo[g][s][t].toFixed(2) + ' kW/m²');
-                    console.log('       ' + tilt[t] + ' Degrees: '  +E_Geo[g][s][t].toFixed(2) + ' kWh');
-                }
-            }
-        console.log('------------------------');
-    }   
-    
+    	if(selections[g] != undefined){
+			console.log('Address: ' + geoList[g]);
+		        for (s = 0; s < selections[g].length; s++){
+		            numFace = s + 1;
+		            console.log('   Roof face ' + numFace + ": ");
+		            for (t = 0; t < tilt.length; t++) {
+		                console.log('       ' + tilt[t] + ' Degrees: '  +E_Geo[g][s][t].toFixed(2) + ' kWh');
+		            }
+		        }
+		    console.log('------------------------');
+    	}
+    }
 });
