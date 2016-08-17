@@ -82,7 +82,8 @@ function initDrawing(){
 		strokeColor: '#333333', //drak grey
 		strokeWeight: 1,
 		fillOpacity: 0.8,
-		editable: true
+		editable: true,
+		clickable:true
 	};
 	// Creates a drawing manager for drawing polygons
 	drawingManager = new google.maps.drawing.DrawingManager({
@@ -112,7 +113,7 @@ function initDrawing(){
 		//window.alert(coordinatesArray[1].lat());
 		//window.alert(area);
 
-	});
+	});	
 }
 
 //-----------------------------------------------------------------------//
@@ -751,7 +752,7 @@ document.getElementById('generate-output').addEventListener('click', function() 
     
     outputString = JSON.stringify(outputJSON);
     
-   // console.log(outputJSON);
+    // console.log(outputJSON);
     //console.log(outputString);
     
     
