@@ -743,6 +743,11 @@ document.getElementById('generate-output').addEventListener('click', function() 
     
     outputJSON["address"] = geoList;
     outputJSON["selections"] =  selections;
+    outputJSON["area"] = area;
+    outputJSON["energy/m2"] = I_Geo;
+    outputJSON["total_energy"] = E_Geo;
+    //number os panels
+    
     
     outputString = JSON.stringify(outputJSON);
     
