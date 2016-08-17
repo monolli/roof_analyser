@@ -755,6 +755,9 @@ document.getElementById('generate-output').addEventListener('click', function() 
     //console.log(outputString);
     
     
+    //the code below is an example
+    
+    /*
     var numFace = 0;
     
     console.log('Results: ');
@@ -771,4 +774,5 @@ document.getElementById('generate-output').addEventListener('click', function() 
 		    console.log('------------------------');
     	}
     }
+    */
 });
