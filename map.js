@@ -18,6 +18,7 @@ var geoList = [];
 var map;
 var selections = [];
 var tilt = [0,15,30,45,60];
+var outputString;
 
 
 //Function: initMap()
@@ -81,7 +82,8 @@ function initDrawing(){
 		strokeColor: '#333333', //drak grey
 		strokeWeight: 1,
 		fillOpacity: 0.8,
-		editable: true
+		editable: true,
+		clickable:true
 	};
 	// Creates a drawing manager for drawing polygons
 	drawingManager = new google.maps.drawing.DrawingManager({
@@ -111,7 +113,7 @@ function initDrawing(){
 		//window.alert(coordinatesArray[1].lat());
 		//window.alert(area);
 
-	});
+	});	
 }
 
 //-----------------------------------------------------------------------//
@@ -751,7 +753,26 @@ document.getElementById('generate-output').addEventListener('click', function() 
     	} 				
     }
         
-    var numFace = 0;        // Created to output the right polygon number
+    var outputJSON = {};
+    
+    outputJSON["address"] = geoList;
+    outputJSON["selections"] =  selections;
+    outputJSON["area"] = area;
+    outputJSON["energy/m2"] = I_Geo;
+    outputJSON["total_energy"] = E_Geo;
+    //number os panels
+    
+    
+    outputString = JSON.stringify(outputJSON);
+    
+    // console.log(outputJSON);
+    //console.log(outputString);
+    
+    
+    //the code below is an example
+    
+    /*
+    var numFace = 0;
     
     console.log('Results: ');                   //CONSOLE RESULTS OUTPUT
     for (g = 0; g < geoList.length; g++) {
@@ -768,4 +789,5 @@ document.getElementById('generate-output').addEventListener('click', function() 
     	}
         console.log('Weather database location: ' + Location[g]);
     }
+    */
 });
