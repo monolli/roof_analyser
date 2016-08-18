@@ -7,6 +7,7 @@ Summer 2016
 Project Chai Energy
 */
 
+//comment to check workingtree
 
 //Global variables
 var area = [];
