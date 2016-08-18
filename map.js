@@ -10,7 +10,7 @@ Project Chai Energy
 
 //Global variables
 var area = [];
-var colors = ['#00aedb', '#a200ff',	'#f47835', '#d41243', '#8ec127]'];
+//var colors = ['#00aedb', '#a200ff',	'#f47835', '#d41243', '#8ec127]'];
 //to change the selection colors
 var csvData = [];
 var geoIndex = 0;
@@ -18,6 +18,7 @@ var geoList = [];
 var map;
 var selections = [];
 var tilt = [0,15,30,45,60];
+var c_box = [];
 var outputString;
 
 
@@ -83,7 +84,6 @@ function initDrawing(){
 		strokeWeight: 1,
 		fillOpacity: 0.8,
 		editable: true,
-		clickable:true
 	};
 	// Creates a drawing manager for drawing polygons
 	drawingManager = new google.maps.drawing.DrawingManager({
@@ -97,22 +97,39 @@ function initDrawing(){
 		polygonOptions: polyOptions,
 		map: map
 	});
-  
+	
 	google.maps.event.addListener(drawingManager, 'overlaycomplete', function(polygon) {
 		var coordinatesArray = polygon.overlay.getPath().getArray();
+		var temp = [];
+		var zero = [0,0,0,0,0];
+		
+		document.getElementById('check1').checked = false;
+		document.getElementById('check2').checked = false;
+		document.getElementById('check3').checked = false;
+		document.getElementById('check4').checked = false;
+		document.getElementById('check5').checked = false;
+		
 		if(selections[geoIndex] == undefined && selections[geoIndex] == null){
-			var temp = [];
 			temp.push(coordinatesArray);
 			selections.push(temp);
+			
+			temp =[];
+			
+			temp.push(zero);
+			c_box.push(temp);
+			
 		}else{
 			selections[geoIndex].push(coordinatesArray);
+			c_box[geoIndex].push(zero);
 		}
+		
+		//console.log(c_box[geoIndex]);
+		console.log(c_box);
 		//window.alert(selections);
 		// change the fill colour
         calc_area();
 		//window.alert(coordinatesArray[1].lat());
 		//window.alert(area);
-
 	});	
 }
 
@@ -674,6 +691,76 @@ document.getElementById('next-address').addEventListener('click', function (){
 	}else{
 		geoIndex =geoIndex + 1;
 		geocodeAddress(geocoder, map, geoIndex);
+	}
+});
+
+document.getElementById('check1').addEventListener('click', function() {
+	if(selections[geoIndex] == undefined){
+		alert("You don't have a selection yet.");
+	}else if(document.getElementById('check1').checked == true){
+		c_box[geoIndex][selections[geoIndex].length-1][0] = 1;
+		console.log("checked");
+		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+	}else{
+		c_box[geoIndex][selections[geoIndex].length-1][0] = 0;
+		console.log("unchecked");
+		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+	}
+});
+
+document.getElementById('check2').addEventListener('click', function() {
+	if(selections[geoIndex] == undefined){
+		alert("You don't have a selection yet.");
+	}else if(document.getElementById('check2').checked == true){
+		c_box[geoIndex][selections[geoIndex].length-1][1] = 1;
+		console.log("checked");
+		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+	}else{
+		c_box[geoIndex][selections[geoIndex].length-1][1] = 0;
+		console.log("unchecked");
+		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+	}
+});
+
+document.getElementById('check3').addEventListener('click', function() {
+	if(selections[geoIndex] == undefined){
+		alert("You don't have a selection yet.");
+	}else if(document.getElementById('check3').checked == true){
+		c_box[geoIndex][selections[geoIndex].length-1][2] = 1;
+		console.log("checked");
+		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+	}else{
+		c_box[geoIndex][selections[geoIndex].length-1][2] = 0;
+		console.log("unchecked");
+		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+	}
+});
+
+document.getElementById('check4').addEventListener('click', function() {
+	if(selections[geoIndex] == undefined){
+		alert("You don't have a selection yet.");
+	}else if(document.getElementById('check4').checked == true){
+		c_box[geoIndex][selections[geoIndex].length-1][3] = 1;
+		console.log("checked");
+		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+	}else{
+		c_box[geoIndex][selections[geoIndex].length-1][3] = 0;
+		console.log("unchecked");
+		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+	}
+});
+
+document.getElementById('check5').addEventListener('click', function() {
+	if(selections[geoIndex] == undefined){
+		alert("You don't have a selection yet.");
+	}else if(document.getElementById('check5').checked == true){
+		c_box[geoIndex][selections[geoIndex].length-1][4] = 1;
+		console.log("checked");
+		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+	}else{
+		c_box[geoIndex][selections[geoIndex].length-1][4] = 0;
+		console.log("unchecked");
+		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
 	}
 });
 
