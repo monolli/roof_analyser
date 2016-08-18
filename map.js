@@ -409,7 +409,7 @@ function I_o (numGeo,numPoly, sigma, day, hour){
     // Io = Extraterrestrial radiation on a horizontal surface [MJ/m2] 
 }
 
-//Function: Io (numPoly, sigma, day, hour)
+//Function: I_d (I, Io)
 //Purpose:	Calculate the diffused irradiation, which is one of the parameters
 //for the total roof radiation
 //to wethear data.
@@ -438,35 +438,47 @@ function I_d (I, Io){
     return id;
 }
 
+//Function: I_data ()
+//Purpose:	Create the an array with the nearest weather database 
+//Parameters: None 
+//Returns:	An global horizontal irradiation array [w/m²] and the database location
 function I_data () {
     
-    var I = [];       // GHI [w/m²]
-    var temp = [];
+    var I = [];         // GHI [w/m²]
+    var temp = [];      // Temporary array 
+    var Location = [];  // String with location
     var i = 0;          // Excel line
     var j = 0;          // Excel Column
-    var lat = 0;
-    var lng = 0;
+    var dist = 0;       // Calculated distance
+    var distMin = 0     // Min distance 
+    var index = 0;      // The column where the nearest database was found
     
-    for (var g = 0; g < geoList.length; g++) {
-        while (csvData[0][1+j] != "end") {
-            if (selections[g]!= undefined && 				//Have at least one selection
-            	selections[g][0][0].lat() <= parseInt(csvData[0][1+j])+1            //Superior Latitude Limit
-                && selections[g][0][0].lat() >= parseInt(csvData[0][1+j])-1         //Inferior Superior Limit  
-                  && selections[g][0][0].lng() <= parseInt(csvData[1][1+j])+1       //Inferior Superior Limit
-                    && selections[g][0][0].lng() >= parseInt(csvData[1][1+j])-1) {  //Superior Superior Limit
-                                                                                    // THE LONGITUDE IS NEGATIVE
-                for (i = 0; i < 17520; i++) {
-                    temp[i] = parseInt(csvData[3+i][1+j]);
+    for (var g = 0; g < geoList.length; g++) {  // Find for each house 
+        
+        if (selections[g]!= undefined){         // Does not run if the selection does not exist
+            while ( (j+1) < csvData[3].length) {
+                dist = Math.pow(Math.pow(csvData[3][1+j]-selections[g][0][0].lat(),2)+ 
+                                Math.pow(csvData[4][1+j]-selections[g][0][0].lng(),2),0.5);
+                                //Distance between two points (Pythagorean theorem)
+                if (j == 0){
+                    distMin = dist;     // distMin starts with first distance value           
                 }
-                I.push(temp);
-                break;   
+                if (dist < distMin){    // Change the min distance if the new value is lower than the previous
+                    distMin = dist;
+                    index = j;          // Columnm where the database is in the spreadsheet
+                }
+                j = j + 1   // Go to the next column in the spreadsheet
             }
-        j = j + 1;
+            for (i = 0; i < 17519; i++) {   
+                temp[i] = parseInt(csvData[6+i][1+index]);  
+                // Create the temporary vector with the weather data
+            }
+            I.push(temp);                       // Global irradiation vector
+            Location [g] = csvData[2][1+index];     // Location address in the spreadsheet
+            j = 0;      // Reinicialization of j for a new house 
         }
-    j = 0;
     }
-    
-    return I;
+    return [I, Location];         // Returns the array and the location
 }
 //Function: Itilt (tilt, hour, sunshine, sunset, Ib, Rb, Id, I, rho_g)
 //Purpose:	Calculates the total radiation on the tilted roof.
@@ -477,12 +489,13 @@ function I_data () {
 function Itilt (numTilt, hour, sunshine, sunset, Ib, Rb, Id, I, rho_g){
     
     if (tilt[numTilt] < 0 || tilt[numTilt] > 90 || hour < sunshine || hour > sunset){
-        var I_Tilt = 0;         
+        var I_Tilt = 0;         // Conditions where there is no sun in the surface
     }
     else {
         var I_Tilt = Ib*Rb
                       +Id*((1+CosDeg(tilt[numTilt]))/2)
-                      +I*rho_g*((1-CosDeg(tilt[numTilt]))/2);
+                      +I*rho_g*((1-CosDeg(tilt[numTilt]))/2);   
+        //Equation to calculate the total irradiation in a tilted plane.
     }
     return I_Tilt;
     //Total irradiation on a tilted plane (time interval)    
@@ -664,57 +677,57 @@ document.getElementById('next-address').addEventListener('click', function (){
 
 document.getElementById('generate-output').addEventListener('click', function() {
     
-    var Orient = 0;
-    var sigma = 0;          
-    var Hour_Shine = 0;
-    var Hour_Set = 0;
-    var teta = 0;
-    var tetaZ = 0;
-    var Io = 0;
-    var Id = 0;
-    var Rb = 0;
-    var Ib = 0;
-    var rho_g = 0.25;       //Diffuse Reflectance Reference:http://www.simulatedvision.co.uk/V&A_Chap14.pdf
-    var I_inter = 0;
-    var I = 0;
-    var sumEnergy = 0;
+    var Orient = 0;         // Roof Orientation
+    var sigma = 0;          // Sun`s declination
+    var Hour_Shine = 0;     // Sunshine hour
+    var Hour_Set = 0;       // Sunset hour
+    var teta = 0;           // Angle between the sun vector and the tilted roof orientation
+    var tetaZ = 0;          // Angle between the sun vector and a horizontal surface
+    var Io = 0;             // Extraterrestrial radiantion on a horizontal surface
+    var Id = 0;             // Diffused radiation
+    var Rb = 0;             // Ratio between the horizontal and tilted surfaces
+    var Ib = 0;             //
+    var rho_g = 0.25;       // Diffuse Reflectance Reference:http://www.simulatedvision.co.uk/V&A_Chap14.pdf
+    var I_inter = 0;        // Total Irradiation - Half hour fraction 
+    var I = 0;              // Weather data
+    var Location = "";      // Location string 
     
-    var Idata = [[]];
+    var Idata = [[]];       // Weather data
     
-    var I_Tilt = 0;
-    var E_Tilt = 0;
-    var I_Surface = [];
-    var E_Surface = [];
-    var I_Geo = [];
-    var E_Geo = [];
+    var I_Tilt = 0;         // Total irradiation for each angle 
+    var E_Tilt = 0;         // Total energy for each angle
+    var I_Surface = [];     // Total irradiaton for each surface
+    var E_Surface = [];     // Total energy for each surface
+    var I_Geo = [];         // Total irradiation for each house
+    var E_Geo = [];         // Total energy for each house
     
-    var I_temp1 = [];
-    var E_temp1 = [];
-    var I_temp2 = [];
-    var E_temp2 = [];
+    var I_temp1 = [];       // Temporary vector to avoid bugs
+    var E_temp1 = [];       // Temporary vector to avoid bugs
+    var I_temp2 = [];       // Temporary vector to avoid bugs
+    var E_temp2 = [];       // Temporary vector to avoid bugs
 
-    Idata = I_data();
+    [Idata, Location] = I_data();      // Create the weather array and find the source location
     
-    for (var g = 0; g < geoList.length; g++ ) {
-    	if( selections[g] != undefined ){		//Have at least one selection
-			for (var s = 0; s < selections[g].length; s++) {
-		        Orient = Orientation (g, s); // i = polygon number that you want to calculate;
-		        for (var t = 0; t < tilt.length; t++) {
-		            for (var day = 1; day <= 365; day++) {
-		                sigma = Sigma (day);
-		                Hour_Shine = SunShine (g, s, sigma);
-		                Hour_Set = SunSet (g, s, sigma);
-		                for (var hour = 0; hour <= 23.5; hour = hour + 0.5){
-		                    teta = Teta (g, s, t, sigma, Orient, hour);         //Check gama
-		                    tetaZ = TetaZ (g, s, sigma, hour);
-		                    I = Idata[g][(hour/0.5)+(day-1)*(24/0.5)] * 0.0018;
+    for (var g = 0; g < geoList.length; g++ ) {     //Runs for all the houses
+    	if( selections[g] != undefined ){      //Have at least one selection
+			for (var s = 0; s < selections[g].length; s++) {     //Runs for all selections
+		        Orient = Orientation (g, s);          // Polygon orientation for one of the "g" house surfaces
+		        for (var t = 0; t < tilt.length; t++) {   // Runs for all the possible selected tilts
+		            for (var day = 1; day <= 365; day++) {    // Runs for the entire year
+		                sigma = Sigma (day);                  // Sun's declination 
+		                Hour_Shine = SunShine (g, s, sigma);  // SunShine
+		                Hour_Set = SunSet (g, s, sigma);      //SunSet
+		                for (var hour = 0; hour <= 23.5; hour = hour + 0.5){  //Runs for each half an hour
+		                    teta = Teta (g, s, t, sigma, Orient, hour);       
+		                    tetaZ = TetaZ (g, s, sigma, hour);                
+		                    I = Idata[g][(hour/0.5)+(day-1)*(24/0.5)]  * 0.0018; //multiplies for 0.0018 to convert from w/m² to MJ/m² for a half an hour
 		                    Io = I_o (g, s, sigma, day, hour);
 		                    Id = I_d (I, Io);
 		                    Rb = CosDeg(teta)/CosDeg(tetaZ);
-		                    Ib = I - Id;
+		                    Ib = I - Id;      // Irradiation beam it just the difference between GHI and the diffused irradiation
 		                    I_inter = Itilt (t, hour, Hour_Shine, Hour_Set, Ib, Rb, Id, I, rho_g)/3.6;
 		                    I_Tilt = I_Tilt + I_inter;
-		                    E_Tilt = E_Tilt + (I_inter/CosDeg(tilt[t]))*area[g][s];
+		                    E_Tilt = E_Tilt + (I_inter/CosDeg(tilt[t]))*area[g][s];   // To calculate the energy it is necessary to multiplies for the area, since we have the flat area its need to be converted to projected area. Aproj = Aflat/cos(tilt). It means that the highers angles will have greaters areas.
 		                }
 		            }
 				    I_temp1[t] = I_Tilt;
@@ -724,23 +737,23 @@ document.getElementById('generate-output').addEventListener('click', function() 
 		        }
 				I_Surface.push (I_temp1);
 				E_Surface.push (E_temp1);
-				I_temp2[s] = I_Surface[s];
-				E_temp2[s] = E_Surface[s];
+				I_temp2[s] = I_Surface[s];  // Restart for the next surface
+				E_temp2[s] = E_Surface[s];  // Restart for the next surface
 				I_temp1 = [];
 				E_temp1 = [];
 		    }
 			I_Geo.push (I_temp2);
 			E_Geo.push (E_temp2);
-			I_Surface = [];
-			E_Surface = [];
-			I_temp2 = [];    
-			E_temp2 = [];
+			I_Surface = [];  // Restart for the next house
+			E_Surface = [];  // Restart for the next house
+			I_temp2 = [];    // Restart for the next house 
+			E_temp2 = [];    // Restart for the next house
     	} 				
     }
         
-    var numFace = 0;
+    var numFace = 0;        // Created to output the right polygon number
     
-    console.log('Results: ');
+    console.log('Results: ');                   //CONSOLE RESULTS OUTPUT
     for (g = 0; g < geoList.length; g++) {
     	if(selections[g] != undefined){
 			console.log('Address: ' + geoList[g]);
@@ -753,5 +766,6 @@ document.getElementById('generate-output').addEventListener('click', function() 
 		        }
 		    console.log('------------------------');
     	}
+        console.log('Weather database location: ' + Location[g]);
     }
 });
