@@ -775,11 +775,11 @@ document.getElementById('generate-output').addEventListener('click', function() 
     var Io = 0;             // Extraterrestrial radiantion on a horizontal surface
     var Id = 0;             // Diffused radiation
     var Rb = 0;             // Ratio between the horizontal and tilted surfaces
-    var Ib = 0;             //
-    var rho_g = 0.25;       // Diffuse Reflectance Reference:http://www.simulatedvision.co.uk/V&A_Chap14.pdf
+    var Ib = 0;             // Beam Irradiation for a hour
+    var rho_g = 0.25;       // Diffuse Reflectance Reference - http://www.simulatedvision.co.uk/V&A_Chap14.pdf
     var I_inter = 0;        // Total Irradiation - Half hour fraction 
     var I = 0;              // Weather data
-    var Location = "";      // Location string 
+    var Location = [];      // Location string 
     
     var Idata = [[]];       // Weather data
     
@@ -798,25 +798,31 @@ document.getElementById('generate-output').addEventListener('click', function() 
     [Idata, Location] = I_data();      // Create the weather array and find the source location
     
     for (var g = 0; g < geoList.length; g++ ) {     //Runs for all the houses
-    	if( selections[g] != undefined ){      //Have at least one selection
+    	if( selections[g] != undefined ){           //Have at least one selection
 			for (var s = 0; s < selections[g].length; s++) {     //Runs for all selections
 		        Orient = Orientation (g, s);          // Polygon orientation for one of the "g" house surfaces
 		        for (var t = 0; t < tilt.length; t++) {   // Runs for all the possible selected tilts
-		            for (var day = 1; day <= 365; day++) {    // Runs for the entire year
-		                sigma = Sigma (day);                  // Sun's declination 
-		                Hour_Shine = SunShine (g, s, sigma);  // SunShine
-		                Hour_Set = SunSet (g, s, sigma);      //SunSet
-		                for (var hour = 0; hour <= 23.5; hour = hour + 0.5){  //Runs for each half an hour
-		                    teta = Teta (g, s, t, sigma, Orient, hour);       
-		                    tetaZ = TetaZ (g, s, sigma, hour);                
-		                    I = Idata[g][(hour/0.5)+(day-1)*(24/0.5)]  * 0.0018; //multiplies for 0.0018 to convert from w/m² to MJ/m² for a half an hour
-		                    Io = I_o (g, s, sigma, day, hour);
-		                    Id = I_d (I, Io);
-		                    Rb = CosDeg(teta)/CosDeg(tetaZ);
-		                    Ib = I - Id;      // Irradiation beam it just the difference between GHI and the diffused irradiation
-		                    I_inter = Itilt (t, hour, Hour_Shine, Hour_Set, Ib, Rb, Id, I, rho_g)/3.6;
-		                    I_Tilt = I_Tilt + I_inter;
-		                    E_Tilt = E_Tilt + (I_inter/CosDeg(tilt[t]))*area[g][s];   // To calculate the energy it is necessary to multiplies for the area, since we have the flat area its need to be converted to projected area. Aproj = Aflat/cos(tilt). It means that the highers angles will have greaters areas.
+                    if (c_box[g][s][t] == 0){
+                        I_Tilt = 0;
+                        E_Tilt = 0;
+                    }
+                    else{
+                        for (var day = 1; day <= 365; day++) {    // Runs for the entire year
+                            sigma = Sigma (day);                  // Sun's declination 
+                            Hour_Shine = SunShine (g, s, sigma);  // SunShine
+                            Hour_Set = SunSet (g, s, sigma);      //SunSet
+                            for (var hour = 0; hour <= 23.5; hour = hour + 0.5){  //Runs for each half an hour
+                                teta = Teta (g, s, t, sigma, Orient, hour);       
+                                tetaZ = TetaZ (g, s, sigma, hour);                
+                                I = Idata[g][(hour/0.5)+(day-1)*(24/0.5)]  * 0.0018; //multiplies for 0.0018 to convert from w/m² to MJ/m² for a half an hour and use in the I_inter formula
+                                Io = I_o (g, s, sigma, day, hour);
+                                Id = I_d (I, Io);
+                                Rb = CosDeg(teta)/CosDeg(tetaZ);
+                                Ib = I - Id;      // Irradiation beam it just the difference between GHI and the diffused irradiation
+                                I_inter = Itilt (t, hour, Hour_Shine, Hour_Set, Ib, Rb, Id, I, rho_g)/3.6;
+                                I_Tilt = I_Tilt + I_inter;
+                                E_Tilt = E_Tilt + (I_inter/CosDeg(tilt[t]))*area[g][s];   // To calculate the energy it is necessary to calculate: energy x  projected area. Since we have the flat area its need to be converted to projected area -> Aproj = Aflat/cos(tilt). It means that the highers angles will have greaters areas.
+                            }
 		                }
 		            }
 				    I_temp1[t] = I_Tilt;
@@ -837,9 +843,76 @@ document.getElementById('generate-output').addEventListener('click', function() 
 			E_Surface = [];  // Restart for the next house
 			I_temp2 = [];    // Restart for the next house 
 			E_temp2 = [];    // Restart for the next house
-    	} 				
+    	}
     }
-        
+    
+    var min_Tilt = 100000000000;
+    var max_Tilt = 0;
+    var Sum_min = [];   
+    var Sum_max = [];
+    var angle_selec_min = [];
+    var angle_selec_max = [];
+    var angles_min = [];
+    var angles_max = [];
+    
+    var coef = 0.8  
+    var Area_panel = 2*3;
+    var Num_panels = []
+    var Num_panels_house = []
+    
+    // Output the max and min values with the selected roof tilts 
+    
+    for (g = 0; g < geoList.length; g++ ) {         //Runs for all the houses
+        Sum_min[g] = 0;     // Sum_min inicialization
+        Sum_max[g] = 0;     // Sum_max inicialization
+        for (s = 0; s < selections[g].length; s++) {    //Runs for all selections
+            min_Tilt = 100000000000;
+            max_Tilt = 0;
+            for (t = 0; t < tilt.length; t++){              //Runs for all the tilts
+                if (I_Geo[g][s][t] < min_Tilt && I_Geo[g][s][t] != 0)  {    
+                    // Found a new min energy value for the face tilt. 
+                    min_Tilt = I_Geo[g][s][t];
+                    // Stores the tilt angle of the roof face that is capable to generate less energy
+                    angle_selec_min[s] = tilt[t];
+                }
+                if (I_Geo[g][s][t] > max_Tilt) {
+                    // Found a new max energy value for the face tilt.
+                    max_Tilt = I_Geo[g][s][t];
+                    // Stores the tilt angle of the roof face that is capable to generate more energy
+                    angle_selec_max[s] = tilt[t];
+                }
+            }
+            if (min_Tilt == 100000000000 && max_Tilt == 0) {  
+                // None of the checkboxes were selected
+                // Since no roof tilted was selected, energy will be equals to 0
+                // and the min and max angle will be equal to -1 (negative value),
+                // to represent that no angle was selected.
+                min_Tilt = 0;
+                angle_selec_min[s] = -1;
+                max_Tilt = 0 ;
+                angle_selec_max[s] = -1;
+            }  
+            // Sum all the roof faces with min energy values
+            Sum_min[g] = Sum_min[g] + min_Tilt;
+            // Sum all the roof faces with max energy value
+            Sum_max[g] = Sum_max[g] + max_Tilt;
+            // Calculates the number os panels for each selection
+            Num_panels[s] = area[g][s]*coef/Area_panel;
+        } 
+        // Creates an array to stores the min angles values for all selections
+        angles_min.push(angle_selec_min);
+        // Creates an array to stores the max angles values for all selections
+        angles_max.push(angle_selec_max); 
+        // Stores the number of panels for each surface of each house
+        Num_panels_house.push(Num_panels);
+        // Restart for the next house
+        angle_selec_min = [];
+        // Restart for the next house
+        angle_selec_max = [];
+        // Restart for the next house
+        Num_panels = [];
+    }
+    
     var outputJSON = {};
     
     outputJSON["address"] = geoList;
@@ -847,13 +920,15 @@ document.getElementById('generate-output').addEventListener('click', function() 
     outputJSON["area"] = area;
     outputJSON["energy/m2"] = I_Geo;
     outputJSON["total_energy"] = E_Geo;
+    outputJSON["checkbox"] = c_box;
+    outputJSON["weather_database"] = Location;
     //number os panels
     
     
     outputString = JSON.stringify(outputJSON);
     
     // console.log(outputJSON);
-    //console.log(outputString);
+       console.log(outputString);
     
     
     //the code below is an example
