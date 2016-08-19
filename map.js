@@ -846,19 +846,27 @@ document.getElementById('generate-output').addEventListener('click', function() 
     	}
     }
     
-    var min_Tilt = 100000000000;
+    var min_Tilt = 100000000000;    
+    // An unrealistic high value to start as min_Tilt, which mean that 
+    // any realistic number will be lower than value
     var max_Tilt = 0;
-    var Sum_min = [];   
-    var Sum_max = [];
-    var angle_selec_min = [];
-    var angle_selec_max = [];
-    var angles_min = [];
-    var angles_max = [];
+    // An unrealistic low value to start as max_Tilt, which mean that 
+    // any realistic number will be greater than value
+    var Sum_min = [];   // min Energy/m² sum of the house
+    var Sum_max = [];   // min Energy/m² sum of the house
+    var angle_selec_min = [];   //min Energy/m² angles for each surface
+    var angle_selec_max = [];   //max Energy/m² angles for each surface
+    var angles_min = [];    //min Energy/m² angles for each house [all the surfaces]
+    var angles_max = [];    //max Energy/m² angles for each house [all the surfaces]
     
-    var coef = 0.8  
-    var Area_panel = 2*3;
+    var coef = 0.75     
+    // coeficient of how much roof area will be considered in the number of panels calculations
+    var Area_panel = 6; // 2x3 solar panel
+    // Panel area
     var Num_panels = []
+    // Array to store the number of panels for each selection
     var Num_panels_house = []
+    // Array to store the number of panels for each house [all the surfaces]
     
     // Output the max and min values with the selected roof tilts 
     
