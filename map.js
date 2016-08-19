@@ -64,7 +64,7 @@ function geocodeAddress(geocoder,resultMap,index) {
             lng2 = results[0].geometry.location.lng();
             
             resultMap.setCenter({lat: lat2, lng: lng2});
-            resultMap.setZoom(20);
+            resultMap.setZoom(21);
             document.getElementById('address-label').innerHTML = geoList[index];
         } else {
         	window.alert('Geocode was not successful for the following reason: ' + status);
