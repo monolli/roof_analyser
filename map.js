@@ -865,40 +865,44 @@ document.getElementById('generate-output').addEventListener('click', function() 
     for (g = 0; g < geoList.length; g++ ) {         //Runs for all the houses
         Sum_min[g] = 0;     // Sum_min inicialization
         Sum_max[g] = 0;     // Sum_max inicialization
-        for (s = 0; s < selections[g].length; s++) {    //Runs for all selections
-            min_Tilt = 100000000000;
-            max_Tilt = 0;
-            for (t = 0; t < tilt.length; t++){              //Runs for all the tilts
-                if (I_Geo[g][s][t] < min_Tilt && I_Geo[g][s][t] != 0)  {    
-                    // Found a new min energy value for the face tilt. 
-                    min_Tilt = I_Geo[g][s][t];
-                    // Stores the tilt angle of the roof face that is capable to generate less energy
-                    angle_selec_min[s] = tilt[t];
-                }
-                if (I_Geo[g][s][t] > max_Tilt) {
-                    // Found a new max energy value for the face tilt.
-                    max_Tilt = I_Geo[g][s][t];
-                    // Stores the tilt angle of the roof face that is capable to generate more energy
-                    angle_selec_max[s] = tilt[t];
-                }
-            }
-            if (min_Tilt == 100000000000 && max_Tilt == 0) {  
-                // None of the checkboxes were selected
-                // Since no roof tilted was selected, energy will be equals to 0
-                // and the min and max angle will be equal to -1 (negative value),
-                // to represent that no angle was selected.
-                min_Tilt = 0;
-                angle_selec_min[s] = -1;
-                max_Tilt = 0 ;
-                angle_selec_max[s] = -1;
-            }  
-            // Sum all the roof faces with min energy values
-            Sum_min[g] = Sum_min[g] + min_Tilt;
-            // Sum all the roof faces with max energy value
-            Sum_max[g] = Sum_max[g] + max_Tilt;
-            // Calculates the number os panels for each selection
-            Num_panels[s] = area[g][s]*coef/Area_panel;
-        } 
+        
+        if(selections[g] != undefined){
+        	for (s = 0; s < selections[g].length; s++) {    //Runs for all selections
+		        min_Tilt = 100000000000;
+		        max_Tilt = 0;
+		        for (t = 0; t < tilt.length; t++){              //Runs for all the tilts
+		            if (I_Geo[g][s][t] < min_Tilt && I_Geo[g][s][t] != 0)  {    
+		                // Found a new min energy value for the face tilt. 
+		                min_Tilt = I_Geo[g][s][t];
+		                // Stores the tilt angle of the roof face that is capable to generate less energy
+		                angle_selec_min[s] = tilt[t];
+		            }
+		            if (I_Geo[g][s][t] > max_Tilt) {
+		                // Found a new max energy value for the face tilt.
+		                max_Tilt = I_Geo[g][s][t];
+		                // Stores the tilt angle of the roof face that is capable to generate more energy
+		                angle_selec_max[s] = tilt[t];
+		            }
+		        }
+		        if (min_Tilt == 100000000000 && max_Tilt == 0) {  
+		            // None of the checkboxes were selected
+		            // Since no roof tilted was selected, energy will be equals to 0
+		            // and the min and max angle will be equal to -1 (negative value),
+		            // to represent that no angle was selected.
+		            min_Tilt = 0;
+		            angle_selec_min[s] = -1;
+		            max_Tilt = 0 ;
+		            angle_selec_max[s] = -1;
+		        }  
+		        // Sum all the roof faces with min energy values
+		        Sum_min[g] = Sum_min[g] + min_Tilt;
+		        // Sum all the roof faces with max energy value
+		        Sum_max[g] = Sum_max[g] + max_Tilt;
+		        // Calculates the number os panels for each selection
+		        Num_panels[s] = area[g][s]*coef/Area_panel;
+        	} 
+        }
+        
         // Creates an array to stores the min angles values for all selections
         angles_min.push(angle_selec_min);
         // Creates an array to stores the max angles values for all selections
@@ -922,6 +926,7 @@ document.getElementById('generate-output').addEventListener('click', function() 
     outputJSON["total_energy"] = E_Geo;
     outputJSON["checkbox"] = c_box;
     outputJSON["weather_database"] = Location;
+    outputJSON["number_of_panels"] = Num_panels_house;
     //number os panels
     
     
