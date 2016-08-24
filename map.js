@@ -336,12 +336,18 @@ return orient;
 function Sigma (day) {
     
     var B = ((day-1)*(360/365))*(Math.PI/180);
+
+
+    
     var sigma =  (180/Math.PI)*(0.006918                             
                     -0.399912*Math.cos(B)+0.070257*Math.sin(B)
                     -0.006758*Math.cos(2*B)+0.000907*Math.sin(2*B)
                     -0.002697*Math.cos(3*B)+0.00148*Math.sin(3*B)); 
     return sigma;
 }
+
+//Reference: J. A. Duffie and W. A. Beckman (2013) "Solar Engineering of Thermal Processes." Fourth Edition, page 9, equation 1.4.2
+//Reference: J. A. Duffie and W. A. Beckman (2013) "Solar Engineering of Thermal Processes." Fourth Edition, page 14, equation 1.6.1b
 
 //-----------------------------------------------------------------------//
 
@@ -357,6 +363,8 @@ function SunShine (numGeo,numPoly, sigma) {
     return hourShine;                    
 }
 
+//Reference: J. A. Duffie and W. A. Beckman (2013) "Solar Engineering of Thermal Processes." Fourth Edition, page 17, equation 1.6.10
+
 //-----------------------------------------------------------------------//
 
 //Function: SunSet (numPoly, sigma)
@@ -370,6 +378,8 @@ function SunSet (numGeo,numPoly, sigma){
     // Sunset hour [hour]   WARNING: THE VALUE OF wSET is NEGATIVE
     return hourSet;
 }
+
+//Reference: J. A. Duffie and W. A. Beckman (2013) "Solar Engineering of Thermal Processes." Fourth Edition, page 17, equation 1.6.10
 
 //-----------------------------------------------------------------------//
 
@@ -385,6 +395,8 @@ function TetaZ (numGeo,numPoly,sigma,hour){
                 +SinDeg(selections[numGeo][numPoly][0].lat())*SinDeg(sigma));
     return tetaZ;
 }
+
+//Reference: J. A. Duffie and W. A. Beckman (2013) "Solar Engineering of Thermal Processes." Fourth Edition, page 15, equation 1.6.5
 
 //-----------------------------------------------------------------------//
 
@@ -405,6 +417,8 @@ function Teta (numGeo, numPoly, numTilt, sigma, gama, hour) {
                 +CosDeg(sigma)*SinDeg(tilt[numTilt])*SinDeg(gama)*SinDeg(w1));
     return teta;
 }
+
+//Reference: J. A. Duffie and W. A. Beckman (2013) "Solar Engineering of Thermal Processes." Fourth Edition, page 14, equation 1.6.2
 
 //-----------------------------------------------------------------------//
 
@@ -427,6 +441,10 @@ function I_o (numGeo,numPoly, sigma, day, hour){
     return io;
     // Io = Extraterrestrial radiation on a horizontal surface [MJ/m2] 
 }
+
+//Reference: J. A. Duffie and W. A. Beckman (2013) "Solar Engineering of Thermal Processes." Fourth Edition, page 40, equation 1.10.4
+
+//-----------------------------------------------------------------------//
 
 //Function: I_d (I, Io)
 //Purpose:	Calculate the diffused irradiation, which is one of the parameters
@@ -457,10 +475,14 @@ function I_d (I, Io){
     return id;
 }
 
+//Reference: J. A. Duffie and W. A. Beckman (2013) "Solar Engineering of Thermal Processes." Fourth Edition, page 76, equation 2.10.1
+
+//-----------------------------------------------------------------------//
+
 //Function: I_data ()
-//Purpose:	Create the an array with the nearest weather database 
+//Purpose:	Create the an array with the nearest weather database
 //Parameters: None 
-//Returns:	An global horizontal irradiation array [w/m²] and the database location
+//Returns:	An global horizontal irradiation array [w/m²] and the weather database locations
 function I_data () {
     
     var I = [];         // GHI [w/m²]
@@ -497,8 +519,32 @@ function I_data () {
             j = 0;      // Reinicialization of j for a new house 
         }
     }
-    return [I, Location];         // Returns the array and the location
+    return [I, Location];  // Returns the Irradiation array and an array with the weather database locations
 }
+
+// HOW TO UPDATE THE WEATHER DATABASE:
+// 1. Launch the NSRDB Viewer at https://nsrdb.nrel.gov/nsrdb-viewer
+// 2. Find in the World Map the place that you want to have the data
+// 3. In the top of the page, you should se the option "Download Data"
+// 4. In this option, click in the dot icon in the option "NSRDB Data Download (Point)"
+// 5. Give the following information and click "Continue"
+//          Full Name:
+//          Organization/Affiliation:
+//          Planned Use:
+//          Email:
+// 6. Click in the option "PSM"
+// 7. For the macro runs properly, you should select 2010, 2011, 2012, 2013, 2014 and JUST select the option GHI in the "Select Attibutes" subtopic. Regarding to the "Select Attributes" all the checkbox remain the same.
+// 8. The data will me send to the regitered e-mail address as a ZIP file.
+// 9. After downloading the data it is necessary to unzip the entire folder
+// 10. Open the macro spreadsheet (nrel_database.xlsm) 
+// 11. For running the macro, you should go to the "weather_calculation" sheet and click at the "Execute" button.
+// 12. It will request you to select the folder that contains the data that you want to update.
+// 13. It will take about 5 seconds to update the data in the "whether_data" sheet.
+// 14. To keep the program organized, you should go the last column of the wether_data and write where the data that was calculated came from.
+// 15. Finally, with the first sheet (WEATHER_DATA) open SAVE AS a CSV file. (It is important to have to have your first sheet open, since a CSV file cannot have more than one sheet in its format.
+
+//-----------------------------------------------------------------------//
+
 //Function: Itilt (tilt, hour, sunshine, sunset, Ib, Rb, Id, I, rho_g)
 //Purpose:	Calculates the total radiation on the tilted roof.
 //Parameters:	Tilt Angle (tilt), currently hour (hour), sunshine and sunset times (sunshine and sunset)
@@ -519,6 +565,8 @@ function Itilt (numTilt, hour, sunshine, sunset, Ib, Rb, Id, I, rho_g){
     return I_Tilt;
     //Total irradiation on a tilted plane (time interval)    
 }
+
+// Reference: J. A. Duffie and W. A. Beckman (2013) "Solar Engineering of Thermal Processes." Fourth Edition, page 90, equation 2.15.2.
 
 //-------------------------------COMMANDS--------------------------------//
 
