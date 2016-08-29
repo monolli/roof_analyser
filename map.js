@@ -11,7 +11,7 @@ Project Chai Energy
 //Global variables
 var area = [];
 //var colors = ['#00aedb', '#a200ff',	'#f47835', '#d41243', '#8ec127]'];
-//to change the selection colors
+//to change the selection colors ##not working##
 var csvData = [];
 var geoIndex = 0;
 var geoList = [];
@@ -33,7 +33,7 @@ function initMap(){
     	    lat: 34.020573,
     	    lng: -118.285414
     	},
-    	zoom: 15,
+    	zoom: 18,
     	mapTypeId: google.maps.MapTypeId.SATELLITE, 
     	minZoom: 13,
     	zoomControlOptions: {
@@ -64,9 +64,12 @@ function geocodeAddress(geocoder,resultMap,index) {
             lng2 = results[0].geometry.location.lng();
             
             resultMap.setCenter({lat: lat2, lng: lng2});
+            //set the zoom for the house image
             resultMap.setZoom(21);
+            //show the address that the map is showing
             document.getElementById('address-label').innerHTML = geoList[index];
         } else {
+        	//show the error message
         	window.alert('Geocode was not successful for the following reason: ' + status);
         }
     });
@@ -103,12 +106,14 @@ function initDrawing(){
 		var temp = [];
 		var zero = [0,0,0,0,0];
 		
+		//when a new polygon is completed the checkboxes get unchecked
 		document.getElementById('check1').checked = false;
 		document.getElementById('check2').checked = false;
 		document.getElementById('check3').checked = false;
 		document.getElementById('check4').checked = false;
 		document.getElementById('check5').checked = false;
 		
+		//if the array position is not initialyzed yet
 		if(selections[geoIndex] == undefined && selections[geoIndex] == null){
 			temp.push(coordinatesArray);
 			selections.push(temp);
@@ -119,6 +124,7 @@ function initDrawing(){
 			c_box.push(temp);
 			
 		}else{
+			//push the infos to the arrays
 			selections[geoIndex].push(coordinatesArray);
 			c_box[geoIndex].push(zero);
 		}
@@ -141,12 +147,14 @@ function initDrawing(){
 //Returns:	nothing
 
 function calc_area(){
-
+	
+	//if the array is not initialyzed yet
 	if(area[geoIndex] == undefined && area[geoIndex] == null){
 			var temp = [];
 			temp.push(google.maps.geometry.spherical.computeArea(selections[geoIndex][selections[geoIndex].length-1]));
 			area.push(temp);
 		}else{
+			//store the infos in the array
 			area[geoIndex].push(google.maps.geometry.spherical.computeArea(selections[geoIndex][selections[geoIndex].length-1]));
 		}	
     
@@ -609,6 +617,7 @@ document.getElementById("import").addEventListener('change',function(){
 		}
 
 		function errorHandler(evt) {
+			//alert error
 			if(evt.target.error.name == "NotReadableError") {
 				alert("Cannot read file!");
 			}
@@ -621,6 +630,7 @@ document.getElementById("import").addEventListener('change',function(){
 		//console.log(csvData);
 
     } else {
+    	//alert error
     	alert('FileReader are not supported in this browser.');
     }
 	
@@ -674,6 +684,7 @@ document.getElementById("importAddress").addEventListener('change',function(){
 //create an action for the "Load Address" button
 document.getElementById('load-addresses').addEventListener('click', function() {
 	var address = document.getElementById('address_text_area').value;
+	//get the value from the array
 	if(address != ""){
 		var data = address.split(',');
 		//separate the address
@@ -683,11 +694,13 @@ document.getElementById('load-addresses').addEventListener('click', function() {
 			}
 		}
 	}
+	//clear the address_text_area
 	document.getElementById('address_text_area').value = "";
 	if(document.getElementById('address-label').innerHTML == "No Address Selected"){
 			geocodeAddress(geocoder, map, geoIndex);
+			//load the first address
 	}
-	console.log(geoList);
+	//console.log(geoList);
 }),
 
 document.getElementById('prev-address').addEventListener('click', function (){
@@ -703,7 +716,7 @@ document.getElementById('prev-address').addEventListener('click', function (){
 });
 
 document.addEventListener('keyup', function(event) {
-  if (event.keyCode == 17) {
+  if (event.keyCode == 17) {	//javascript code for (ctrl)
     if(geoList.length == 0){
 		alert('Load the addresses first.');
 	}
@@ -717,7 +730,7 @@ document.addEventListener('keyup', function(event) {
 });
 
 document.addEventListener('keyup', function(event) {
-  if (event.keyCode == 18) {
+  if (event.keyCode == 18) {	//javascript code for (alt)
     if(geoList.length == 0){
 		alert('Load the addresses first.');
 	}
@@ -747,12 +760,12 @@ document.getElementById('check1').addEventListener('click', function() {
 		alert("You don't have a selection yet.");
 	}else if(document.getElementById('check1').checked == true){
 		c_box[geoIndex][selections[geoIndex].length-1][0] = 1;
-		console.log("checked");
-		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+		//console.log("checked");
+		//console.log(c_box[geoIndex][selections[geoIndex].length-1]);
 	}else{
 		c_box[geoIndex][selections[geoIndex].length-1][0] = 0;
-		console.log("unchecked");
-		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+		//console.log("unchecked");
+		//console.log(c_box[geoIndex][selections[geoIndex].length-1]);
 	}
 });
 
@@ -761,12 +774,12 @@ document.getElementById('check2').addEventListener('click', function() {
 		alert("You don't have a selection yet.");
 	}else if(document.getElementById('check2').checked == true){
 		c_box[geoIndex][selections[geoIndex].length-1][1] = 1;
-		console.log("checked");
-		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+		//console.log("checked");
+		//console.log(c_box[geoIndex][selections[geoIndex].length-1]);
 	}else{
 		c_box[geoIndex][selections[geoIndex].length-1][1] = 0;
-		console.log("unchecked");
-		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+		//console.log("unchecked");
+		//console.log(c_box[geoIndex][selections[geoIndex].length-1]);
 	}
 });
 
@@ -775,12 +788,12 @@ document.getElementById('check3').addEventListener('click', function() {
 		alert("You don't have a selection yet.");
 	}else if(document.getElementById('check3').checked == true){
 		c_box[geoIndex][selections[geoIndex].length-1][2] = 1;
-		console.log("checked");
-		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+		//console.log("checked");
+		//console.log(c_box[geoIndex][selections[geoIndex].length-1]);
 	}else{
 		c_box[geoIndex][selections[geoIndex].length-1][2] = 0;
-		console.log("unchecked");
-		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+		//console.log("unchecked");
+		//console.log(c_box[geoIndex][selections[geoIndex].length-1]);
 	}
 });
 
@@ -789,12 +802,12 @@ document.getElementById('check4').addEventListener('click', function() {
 		alert("You don't have a selection yet.");
 	}else if(document.getElementById('check4').checked == true){
 		c_box[geoIndex][selections[geoIndex].length-1][3] = 1;
-		console.log("checked");
-		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+		//console.log("checked");
+		//console.log(c_box[geoIndex][selections[geoIndex].length-1]);
 	}else{
 		c_box[geoIndex][selections[geoIndex].length-1][3] = 0;
-		console.log("unchecked");
-		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+		//console.log("unchecked");
+		//console.log(c_box[geoIndex][selections[geoIndex].length-1]);
 	}
 });
 
@@ -803,12 +816,12 @@ document.getElementById('check5').addEventListener('click', function() {
 		alert("You don't have a selection yet.");
 	}else if(document.getElementById('check5').checked == true){
 		c_box[geoIndex][selections[geoIndex].length-1][4] = 1;
-		console.log("checked");
-		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+		//console.log("checked");
+		//console.log(c_box[geoIndex][selections[geoIndex].length-1]);
 	}else{
 		c_box[geoIndex][selections[geoIndex].length-1][4] = 0;
-		console.log("unchecked");
-		console.log(c_box[geoIndex][selections[geoIndex].length-1]);
+		//console.log("unchecked");
+		//console.log(c_box[geoIndex][selections[geoIndex].length-1]);
 	}
 });
 
@@ -973,6 +986,8 @@ document.getElementById('generate-output').addEventListener('click', function() 
         Num_panels = [];
     }
     
+    //prepare the JSON array
+    
     var outputJSON = {};
     
     outputJSON["address"] = geoList;
@@ -989,7 +1004,7 @@ document.getElementById('generate-output').addEventListener('click', function() 
     outputString = JSON.stringify(outputJSON);
     
     // console.log(outputJSON);
-       console.log(outputString);
+    //   console.log(outputString);
     
     
     //the code below is an example
